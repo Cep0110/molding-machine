@@ -7,6 +7,18 @@ export default function App() {
   const [outOfTopicError, setOutOfTopicError] = useState('');
   const [selectedImagePreview, setSelectedImagePreview] = useState(null);
 
+  // --- HELPER FUNCTION: CONVERT BASE64 TO BLOB MULTIPART BINARY ---
+  const makeBlobFromBase64 = (base64DataUrl) => {
+    const byteString = atob(base64DataUrl.split(',')[1]);
+    const mimeString = base64DataUrl.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+  };
+
   // --- AUTOMATED INGESTION & PIPELINE ENGINE ---
   const processBatchImage = async (e) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -21,25 +33,24 @@ export default function App() {
     setInferenceResult(null);
     setOutOfTopicError('');
 
-    // Convert raw file stream into Base64 Data URL format string for transmission
+    // Convert raw file stream into Data URL format string for transmission
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = async () => {
-      const base64Data = reader.result;
-
-      // Structure data matrix to match the Gradio client input payload rules
-      const payload = {
-        data: [ base64Data ] 
-      };
-
       try {
-        // Query the active Hugging Face inference container node
+        const base64Data = reader.result;
+        
+        // Convert base64 to binary blob structure to prevent API crash strings
+        const imageBlob = makeBlobFromBase64(base64Data);
+
+        // Construct standard HTTP Multi-part form data body packet
+        const formData = new FormData();
+        formData.append('data', imageBlob, 'feedstock_sample.jpg');
+
+        // Query the active Hugging Face inference container upload endpoint node
         const response = await fetch('https://yani-321212-me-backend.hf.space/api/predict', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+          body: formData,
         });
 
         if (!response.ok) {
@@ -64,7 +75,7 @@ export default function App() {
           });
         }
       } catch (err) {
-        setOutOfTopicError('❌ Connection Fault: Failed to establish data link to the Hugging Face AI node.');
+        setOutOfTopicError('❌ System Error: API data transmission fault. Verify that your Hugging Face Space is not sleeping or building.');
         console.error("Network Exception:", err);
       } finally {
         setAnalyzingImage(false);
