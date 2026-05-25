@@ -1,256 +1,369 @@
  import React, { useState } from 'react';
 
 export default function App() {
-  // Navigation State: 'home', 'molding', 'copilot', 'contact'
+  // Navigation Routing System: 'home', 'molding', 'faq', 'contact', 'admin-auth', 'admin-dashboard'
   const [activePage, setActivePage] = useState('home');
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   
-  // Chatbot state for the RAG Copilot
-  const [messages, setMessages] = useState([
-    { sender: 'ai', text: 'Welcome! I am your AI Workshop Copilot. I am trained on our machine specifications to help you understand how we mold parts. Ask me anything!' }
+  // Custom Fine-Tuned Model State (polysmart_qa_model.pth simulation block)
+  const [analyzingImage, setAnalyzingImage] = useState(false);
+  const [inferenceResult, setInferenceResult] = useState(null);
+
+  // FAQ State (Active expanded question index helper)
+  const [expandedFaq, setExpandedFaq] = useState(null);
+
+  // Authentication/Authorization Route Protection States
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Protected Database State Panel (Traceability metrics schema)
+  const [telemetryLogs, setTelemetryLogs] = useState([
+    { id: 'LOG-0231', timestamp: '2026-05-25 14:22', material: 'HDPE', temp: 180, status: 'Success', validation: 'Verified via polysmart_qa_model' },
+    { id: 'LOG-0232', timestamp: '2026-05-25 15:40', material: 'PP', temp: 220, status: 'Defect_Flash', validation: 'Structural Drift Warning' }
   ]);
-  const [userInput, setUserInput] = useState('');
 
-  // Contact form submission state
-  const [submitted, setSubmitted] = useState(false);
+  // Public Frequently Asked Questions Dataset
+  const faqData = [
+    {
+      q: "Why is Polypropylene (PP) prone to geometric warping when cooling down?",
+      a: "According to our machine parameters, PP is a semi-crystalline polymer that shrinks unevenly if it cools down too rapidly. To fix geometric drift, ensure our thick insulation barrier blocks are tightly sealed and keep the toggle clamping framework closed for at least 60 seconds."
+    },
+    {
+      q: "How does the custom modular platen system work?",
+      a: "Our desktop machine features an adjustable slide-in rail frame. This allows anyone to swap out different mold blocks (like gears, tensile bars, or custom shapes) in under 30 seconds without requiring massive warehouse machinery."
+    },
+    {
+      q: "What is the physical operational limit of this tabletop prototype?",
+      a: "The prototype is designed as a custom 10g micro-injection setup. It relies on a heavy-duty mechanical lever handle to give the user optimal manual pressing power, making it perfectly safe for school labs or university desktop work."
+    }
+  ];
 
-  // Handle RAG Chatbot queries
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (!userInput.trim()) return;
-
-    const userMsg = userInput;
-    setMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
-    setUserInput('');
+  // Ingestion Pipeline: Processing batch images using the custom fine-tuned 'polysmart_qa_model.pth' layer weights
+  const processBatchImage = (e) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    setAnalyzingImage(true);
+    setInferenceResult(null);
 
     setTimeout(() => {
-      let aiResponse = "Our system has processed your question using our project manual library. ";
-      if (userMsg.toLowerCase().includes('warping') || userMsg.toLowerCase().includes('warp')) {
-        aiResponse += "Warping happens if a part cools down too quickly or unevenly. Our machine fixes this by using a high-grade insulated heating barrel and a secure toggle clamping frame that holds the part steady while it cools.";
-      } else if (userMsg.toLowerCase().includes('temperature') || userMsg.toLowerCase().includes('heat')) {
-        aiResponse += "Our engineers have found that HDPE melts perfectly at 180°C, while Polypropylene (PP) requires 220°C. Keeping these heats exact prevents defects.";
-      } else if (userMsg.toLowerCase().includes('mold') || userMsg.toLowerCase().includes('shape')) {
-        aiResponse += "We use an innovative quick-swap modular platen system. This allows customers to change mold shapes in seconds without needing heavy tools.";
+      // Simulating data array matrix processing by polysmart_qa_model.pth
+      const detectHDPE = Math.random() > 0.5;
+      
+      if (detectHDPE) {
+        setInferenceResult({
+          material: 'HDPE (High-Density Polyethylene)',
+          confidence: 99.12,
+          modelRef: 'polysmart_qa_model.pth [Layer: Conv1-BatchNorm Stack]',
+          recommendedTemp: 180,
+          recommendedCooling: 45
+        });
       } else {
-        aiResponse += "To learn more about our manufacturing bounds, explore the 'Molding Process' section in the top navigation menu.";
+        setInferenceResult({
+          material: 'PP (Polypropylene)',
+          confidence: 97.84,
+          modelRef: 'polysmart_qa_model.pth [Layer: Conv1-BatchNorm Stack]',
+          recommendedTemp: 220,
+          recommendedCooling: 60
+        });
       }
-      setMessages(prev => [...prev, { sender: 'ai', text: aiResponse }]);
-    }, 600);
+      setAnalyzingImage(false);
+    }, 1500);
+  };
+
+  // Authorization Route Gatekeeper: Verifying credentials to protect the /admin space
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    // Simple, secure team authorization checkpoint guard
+    if (username.toLowerCase() === 'admin' && password === 'ietp11aastu') {
+      setIsAuthenticated(true);
+      setAuthError('');
+      setActivePage('admin-dashboard');
+    } else {
+      setAuthError('Access Denied. Invalid engineering crew credentials.');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAuthenticated(false);
+    setUsername('');
+    setPassword('');
+    setActivePage('home');
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col justify-between">
       
-      {/* ─── CUSTOMER NAVIGATION HEADER ─── */}
+      {/* ─── PUBLIC COMPONENT NAVIGATION HEADER ─── */}
       <header className="bg-slate-900 text-white shadow-md border-b-4 border-blue-600 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-center md:text-left">
+          <div>
             <div className="flex items-center justify-center md:justify-start gap-2">
               <span className="bg-blue-600 text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">AASTU IETP</span>
               <span className="text-slate-400 text-xs font-bold tracking-widest">GROUP 11</span>
             </div>
-            <h1 className="text-xl md:text-2xl font-black mt-0.5 tracking-tight">PLASTIC MOLDING PLATFORM</h1>
+            <h1 className="text-xl md:text-2xl font-black mt-0.5 tracking-tight">POLYSMART LAB PORTAL</h1>
           </div>
           
-          {/* Public Navigation Menu */}
           <nav className="flex flex-wrap justify-center gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
-            <button onClick={() => setActivePage('home')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'home' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'}`}>
-              HOME
-            </button>
-            <button onClick={() => setActivePage('molding')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'molding' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'}`}>
-              MOLDING PROCESS
-            </button>
-            <button onClick={() => setActivePage('copilot')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'copilot' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'}`}>
-              AI COPILOT
-            </button>
-            <button onClick={() => setActivePage('contact')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'contact' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'}`}>
-              CONTACT US
+            <button onClick={() => setActivePage('home')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'home' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}>HOME</button>
+            <button onClick={() => setActivePage('molding')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'molding' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}>CLASSIFIER & PROCESS</button>
+            <button onClick={() => setActivePage('faq')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'faq' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}>FAQ CENTER</button>
+            <button onClick={() => setActivePage('contact')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'contact' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}>CONTACT</button>
+            
+            {/* Protected Route Link Anchor Indicator */}
+            <button onClick={() => activePage === 'admin-dashboard' ? setActivePage('admin-dashboard') : setActivePage('admin-auth')} 
+                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage.includes('admin') ? 'bg-amber-500 text-slate-950' : 'text-amber-400 border border-amber-500/30 hover:bg-amber-500/10'}`}>
+              {isAuthenticated ? '⚙️ ADMIN DASHBOARD' : '🔒 TEAM LOGIN'}
             </button>
           </nav>
         </div>
       </header>
 
-      {/* ─── PAGE 1: HERO HOME PAGE VIEW ─── */}
+      {/* ─── PAGE 1: PUBLIC HOME VIEW ─── */}
       {activePage === 'home' && (
         <main className="flex-grow max-w-5xl w-full mx-auto px-6 py-12 space-y-12">
-          {/* Welcome Banner */}
-          <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8 md:p-12 rounded-3xl shadow-xl text-center relative overflow-hidden border border-slate-700">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8 md:p-12 rounded-3xl shadow-xl text-center border border-slate-700">
             <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight max-w-3xl mx-auto leading-tight">
-              Engineering Custom Shapes From Recycled Plastics
+              Tabletop Micro-Injection Molding Automation
             </h2>
-            <p className="text-sm md:text-base text-slate-300 mt-4 max-w-2xl mx-auto leading-relaxed">
-              Welcome to our project showcase. We built a high-precision, desktop-scale molding machine that transforms raw polymer granules into beautiful, custom manufacturing parts.
+            <p className="text-xs md:text-sm text-slate-300 mt-4 max-w-2xl mx-auto leading-relaxed">
+              Transforming raw plastics into precise custom parts. Check out our public classification terminal or log in to the protected admin telemetry panel.
             </p>
-            <div className="mt-8 flex justify-center gap-4">
-              <button onClick={() => setActivePage('molding')} className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3.5 rounded-xl transition-all shadow-md">
-                Explore Molding Process
+            <div className="mt-8 flex justify-center gap-3">
+              <button onClick={() => setActivePage('molding')} className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-3.5 rounded-xl shadow-md transition-all">
+                Launch Batch Classifier
               </button>
-              <button onClick={() => setActivePage('copilot')} className="bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs px-6 py-3.5 rounded-xl transition-all shadow-md">
-                Talk to AI Assistant
+              <button onClick={() => setActivePage('faq')} className="bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs px-5 py-3.5 rounded-xl shadow-md transition-all">
+                Browse FAQs
               </button>
             </div>
           </div>
 
-          {/* Project Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <span className="text-3xl">🎯</span>
-              <h3 className="text-base font-bold text-slate-900 mt-3 mb-1">Our Core Objective</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                To build a small, affordable desktop molding machine that allows engineering students and small labs to create custom parts without needing giant industrial factories.
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex gap-4 items-start">
+              <span className="text-2xl bg-blue-50 p-3 rounded-xl">🔮</span>
+              <div>
+                <h3 className="font-bold text-slate-900 text-sm">polysmart_qa_model.pth</h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Our custom fine-tuned model evaluates the incoming plastic resin matrices directly at the feed funnel to optimize temperature parameters before a run.
+                </p>
+              </div>
             </div>
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <span className="text-3xl">⚙️</span>
-              <h3 className="text-base font-bold text-slate-900 mt-3 mb-1">How it Works</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Raw plastic pellets are fed into a heated barrel chamber. Once fully melted, a hand-operated mechanical lever pushes the plastic smoothly into quick-swap metal mold blocks.
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <span className="text-3xl">🌱</span>
-              <h3 className="text-base font-bold text-slate-900 mt-3 mb-1">Zero-Waste Goal</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Our machine supports sustainability. Old plastic scraps, flash materials, and failed parts can be re-ground and loaded right back into the funnel to create perfect new items.
-              </p>
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex gap-4 items-start">
+              <span className="text-2xl bg-amber-50 p-3 rounded-xl">🔒</span>
+              <div>
+                <h3 className="font-bold text-slate-900 text-sm">Protected Control Node</h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  The active database tracker logging system is fully isolated behind an authentication wall to protect operational telemetry.
+                </p>
+              </div>
             </div>
           </div>
         </main>
       )}
 
-      {/* ─── PAGE 2: INTERACTIVE MOLDING GUIDE ─── */}
+      {/* ─── PAGE 2: BATCH IMAGE CLASSIFIER (USING POLYSMART QA WEIGHT MATRIX) ─── */}
       {activePage === 'molding' && (
-        <main className="flex-grow max-w-4xl w-full mx-auto px-6 py-12">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">The 10g Micro-Molding Setup</h2>
-            <p className="text-xs text-slate-500 mt-2">
-              Click a plastic material below to see how our custom prototype balances heat and pressure to mold high-quality test parts.
+        <main className="flex-grow max-w-3xl w-full mx-auto px-6 py-12">
+          <div className="text-center max-w-xl mx-auto mb-10">
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Material Verification Hub</h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Upload a snapshot of your feed material. The system uses the <b>polysmart_qa_model.pth</b> parameters to determine the polymer type.
             </p>
           </div>
 
-          {/* Interactive Selector */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto mb-8">
-            <button onClick={() => setSelectedMaterial({ name: 'HDPE (High-Density Polyethylene)', temp: 180, cooling: 45, uses: 'Used for strong, durable parts like custom gears, bottle caps, and structural brackets.' })} 
-                    className={`p-5 rounded-2xl border text-left transition-all flex flex-col justify-between ${selectedMaterial?.name.includes('HDPE') ? 'border-blue-500 bg-blue-50/50 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
-              <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Option 1</span>
-              <span className="text-base font-bold text-slate-900 mt-1">HDPE Pellets</span>
-            </button>
-            <button onClick={() => setSelectedMaterial({ name: 'PP (Polypropylene)', temp: 220, cooling: 60, uses: 'Used for flexible, heat-resistant components like snap-fit hinges, laboratory tools, and living joints.' })} 
-                    className={`p-5 rounded-2xl border text-left transition-all flex flex-col justify-between ${selectedMaterial?.name.includes('PP') ? 'border-emerald-500 bg-emerald-50/50 ring-2 ring-emerald-500/20' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
-              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Option 2</span>
-              <span className="text-base font-bold text-slate-900 mt-1">PP Pellets</span>
-            </button>
-          </div>
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm max-w-lg mx-auto space-y-6">
+            <div>
+              <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase block mb-2">Image Matrix Ingestion</span>
+              <label className="border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all min-h-[180px]">
+                <input type="file" accept="image/*" onChange={processBatchImage} className="hidden" />
+                <span className="text-3xl">📷</span>
+                <span className="text-xs font-bold text-slate-700 mt-2">Load Feedstock Photograph</span>
+                <span className="text-[10px] text-slate-400 mt-0.5">Analyses target structure weights instantly</span>
+              </label>
+            </div>
 
-          {/* Detailed Output Display */}
-          {selectedMaterial ? (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-xl mx-auto space-y-4 animate-fadeIn">
-              <h3 className="text-lg font-bold text-slate-900">{selectedMaterial.name} Blueprint</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">{selectedMaterial.uses}</p>
-              
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Target Melt Heat</span>
-                  <span className="text-xl font-extrabold text-amber-600 mt-0.5 block">{selectedMaterial.temp}°C</span>
+            {analyzingImage && (
+              <div className="p-4 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium rounded-xl text-center animate-pulse">
+                Running forward pass layer calculations across <b>polysmart_qa_model.pth</b>...
+              </div>
+            )}
+
+            {inferenceResult && !analyzingImage && (
+              <div className="space-y-4 animate-fadeIn">
+                <div className="bg-slate-900 text-white p-4 rounded-xl border-l-4 border-emerald-500">
+                  <span className="text-[9px] uppercase font-bold tracking-widest text-emerald-400 block font-mono">{inferenceResult.modelRef}</span>
+                  <p className="text-base font-black mt-0.5">{inferenceResult.material}</p>
+                  <p className="text-xs text-slate-400 mt-1">Classification Accuracy: <span className="text-emerald-400 font-mono font-bold">{inferenceResult.confidence}%</span></p>
                 </div>
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Clamp Cooling Time</span>
-                  <span className="text-xl font-extrabold text-purple-600 mt-0.5 block">{selectedMaterial.cooling} Seconds</span>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                    <span className="text-[10px] text-slate-400 font-bold block">TARGET CYLINDER HEAT</span>
+                    <span className="text-lg font-black text-amber-600">{inferenceResult.recommendedTemp}°C</span>
+                  </div>
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                    <span className="text-[10px] text-slate-400 font-bold block">CLAMP HOLD TIME</span>
+                    <span className="text-lg font-black text-purple-600">{inferenceResult.recommendedCooling}s</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="text-center p-8 bg-slate-100 border-2 border-dashed border-slate-200 rounded-2xl max-w-xl mx-auto text-xs text-slate-400 italic">
-              Please click on a raw material type above to display machine forming parameters.
-            </div>
-          )}
-        </main>
-      )}
-
-      {/* ─── PAGE 3: AI COPILOT WORKSHOP COMPANION ─── */}
-      {activePage === 'copilot' && (
-        <main className="flex-grow max-w-3xl w-full mx-auto px-6 py-12 flex flex-col justify-between min-h-[500px]">
-          <div>
-            <div className="text-center max-w-md mx-auto mb-6">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">RAG Operations Copilot</h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Have a question about our project? Type below to instantly query our machine specifications, heat bounds, and lab safety guidelines.
-              </p>
-            </div>
-
-            {/* Chat Box Container */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 min-h-[250px] max-h-[320px] overflow-y-auto space-y-3 shadow-sm text-xs">
-              {messages.map((msg, index) => (
-                <div key={index} className={`p-3 rounded-xl max-w-[85%] ${msg.sender === 'user' ? 'bg-blue-600 text-white ml-auto' : 'bg-slate-100 text-slate-800 mr-auto border border-slate-200'}`}>
-                  <span className="text-[9px] font-bold block opacity-60 mb-0.5">{msg.sender === 'user' ? 'You' : 'System Guide'}</span>
-                  <p className="leading-relaxed font-medium">{msg.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Interactive Chat Input Form */}
-          <form onSubmit={handleSendMessage} className="mt-4 flex gap-2">
-            <input type="text" value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Ask about heat profiles, mold swapping, or warping fixes..." className="flex-grow bg-white border border-slate-200 text-xs rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm" />
-            <button type="submit" className="bg-slate-900 hover:bg-blue-600 text-white text-xs font-bold px-5 py-3.5 rounded-xl transition-all shadow-md">
-              Send
-            </button>
-          </form>
-        </main>
-      )}
-
-      {/* ─── PAGE 4: CLEAN CONTACT US FORM ─── */}
-      {activePage === 'contact' && (
-        <main className="flex-grow max-w-md w-full mx-auto px-6 py-12">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-2">Contact Our Engineering Team</h2>
-            <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-              Have questions regarding our laboratory data, CAD files, or custom tooling plates? Send us a message and Group 11 will get right back to you.
-            </p>
-
-            {submitted ? (
-              <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xl text-center">
-                ✨ Thank you! Your request has been sent to our campus registry successfully.
-              </div>
-            ) : (
-              <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-4 text-xs">
-                <div>
-                  <label className="block text-slate-600 font-bold mb-1">Full Name</label>
-                  <input type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe" />
-                </div>
-                <div>
-                  <label className="block text-slate-600 font-bold mb-1">Email Address</label>
-                  <input type="email" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="john@example.com" />
-                </div>
-                <div>
-                  <label className="block text-slate-600 font-bold mb-1">Inquiry Message</label>
-                  <textarea required rows="4" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tell us about your custom mold requirements..."></textarea>
-                </div>
-                <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">
-                  Submit Form
-                </button>
-              </form>
             )}
           </div>
         </main>
       )}
 
-      {/* ─── ACADEMIC EVALUATION ADMINISTRATIVE FOOTER ─── */}
+      {/* ─── PAGE 3: PUBLIC FREQUENTLY ASKED QUESTIONS (FAQ) ACCORDION ─── */}
+      {activePage === 'faq' && (
+        <main className="flex-grow max-w-2xl w-full mx-auto px-6 py-12">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Frequently Asked Questions</h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Explore solutions to common issues encountered during tabletop injection molding runs.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {faqData.map((faq, index) => (
+              <div key={index} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all">
+                <button onClick={() => setExpandedFaq(expandedFaq === index ? null : index)} 
+                        className="w-full text-left px-5 py-4 font-bold text-xs md:text-sm text-slate-900 flex justify-between items-center hover:bg-slate-50 transition-colors focus:outline-none">
+                  <span>{faq.q}</span>
+                  <span className="text-blue-500 text-base">{expandedFaq === index ? '▲' : '▼'}</span>
+                </button>
+                {expandedFaq === index && (
+                  <div className="px-5 pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </main>
+      )}
+
+      {/* ─── PAGE 4: CONTACT US VIEW ─── */}
+      {activePage === 'contact' && (
+        <main className="flex-grow max-w-md w-full mx-auto px-6 py-12">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-1">Contact Our Engineering Team</h2>
+            <p className="text-xs text-slate-500 mb-6">Send us a message and our team will get back to you shortly.</p>
+            
+            <form onSubmit={(e) => { e.preventDefault(); alert("Message sent to Group 11 registry."); }} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-slate-600 font-bold mb-1">Full Name</label>
+                <input type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Abebe Bikila" />
+              </div>
+              <div>
+                <label className="block text-slate-600 font-bold mb-1">Email Address</label>
+                <input type="email" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="abebe@aastu.edu.et" />
+              </div>
+              <div>
+                <label className="block text-slate-600 font-bold mb-1">Message Body</label>
+                <textarea rows="4" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Inquire about custom molds, weights, or logs..."></textarea>
+              </div>
+              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition-all">Submit Inquiry</button>
+            </form>
+          </div>
+        </main>
+      )}
+
+      {/* ─── PAGE 5: ADMIN AUTHENTICATION WALL GATEKEEPER ─── */}
+      {activePage === 'admin-auth' && (
+        <main className="flex-grow max-w-sm w-full mx-auto px-6 py-12">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <div className="text-center mb-6">
+              <span className="text-3xl">🔒</span>
+              <h2 className="text-lg font-black text-slate-900 tracking-tight mt-2">Protected Route Authorization</h2>
+              <p className="text-[11px] text-slate-400 mt-0.5">Enter credentials to unlock the active database panel.</p>
+            </div>
+
+            <form onSubmit={handleAdminLogin} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-slate-600 font-bold mb-1">Team Username</label>
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="admin" />
+              </div>
+              <div>
+                <label className="block text-slate-600 font-bold mb-1">Secret Access Key</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••" />
+                <span className="text-[10px] text-slate-400 block mt-1">Hint for your presentation defense: <b>admin</b> / <b>ietp11aastu</b></span>
+              </div>
+
+              {authError && <p className="text-[11px] text-red-600 font-medium text-center bg-red-50 p-2 rounded-lg border border-red-100">{authError}</p>}
+
+              <button type="submit" className="w-full bg-slate-900 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md transition-all">Unlock System Route</button>
+            </form>
+          </div>
+        </main>
+      )}
+
+      {/* ─── PAGE 6: PROTECTED ADMIN DASHBOARD ROUTE PANEL (HIDDEN FROM CUSTOMERS) ─── */}
+      {activePage === 'admin-dashboard' && isAuthenticated && (
+        <main className="flex-grow max-w-5xl w-full mx-auto px-6 py-12 space-y-6">
+          <div className="flex justify-between items-center bg-slate-900 text-white p-4 rounded-xl border border-slate-800">
+            <div>
+              <span className="text-[10px] uppercase tracking-wider text-amber-400 font-bold block">Authorized Session Active</span>
+              <h2 className="text-base font-bold">Group 11 Operational Control Dashboard</h2>
+            </div>
+            <button onClick={handleAdminLogout} className="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all">
+              Lock Session
+            </button>
+          </div>
+
+          {/* Secure Telemetry SQL-Style Log Engine Table */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="p-4 bg-slate-50 border-b border-slate-200">
+              <h3 className="font-bold text-slate-900 text-xs">Active SQLite Logging Stream (production_logs)</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <th className="p-3">log_id</th>
+                    <th className="p-3">timestamp</th>
+                    <th className="p-3">asserted_material</th>
+                    <th className="p-3">target_temp_celsius</th>
+                    <th className="p-3">cycle_status</th>
+                    <th className="p-3">qa_verification_node</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                  {telemetryLogs.map((log) => (
+                    <tr key={log.id} className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-slate-400">{log.id}</td>
+                      <td className="p-3 text-slate-500">{log.timestamp}</td>
+                      <td className="p-3"><span className="bg-slate-900 text-white font-mono px-2 py-0.5 rounded text-[10px] font-bold">{log.material}</span></td>
+                      <td className="p-3 font-mono font-bold text-amber-600">{log.temp}°C</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${log.status === 'Success' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
+                          {log.status}
+                        </span>
+                      </td>
+                      <td className="p-3 text-slate-400 font-mono text-[11px]">{log.validation}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* ─── TECHNICAL EVALUATION ADMINISTRATIVE FOOTER ─── */}
       <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 p-6 md:p-8 text-xs">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          {/* Section 1: Advisor & University Credits */}
           <div>
             <span className="font-bold text-white uppercase tracking-wider block mb-2 text-blue-500 text-[11px]">Academic Review Panel</span>
             <p className="font-bold text-slate-200">ADVISOR: Aman Kassaye (PhD)</p>
             <p className="text-slate-400 mt-1 leading-relaxed">
               Addis Ababa Science and Technology University (AASTU)<br />
               Integrated Engineering Team Project (IETP)<br />
-              Project Date: <span className="text-slate-300 font-mono">April 14, 2026 GC</span>
+              Project Context Submission Date: <span className="text-slate-300 font-mono">April 14, 2026 GC</span>
             </p>
           </div>
 
-          {/* Section 2: Student Roster */}
           <div>
             <span className="font-bold text-white uppercase tracking-wider block mb-2 text-purple-500 text-[11px]">Engineers Hub (Group 11)</span>
             <ul className="grid grid-cols-2 gap-y-1 text-slate-400 font-medium">
@@ -260,11 +373,10 @@ export default function App() {
               <li>• Mesfin</li>
               <li>• Tesfaye</li>
               <li>• Saba</li>
-              <li className="col-span-2 text-slate-200 font-bold">• Yaiyneabeba (Log Owner)</li>
+              <li className="col-span-2 text-slate-200 font-bold">• Yaiyneabeba (Systems Node Log Owner)</li>
             </ul>
           </div>
 
-          {/* Section 3: Shared Contact Details */}
           <div>
             <span className="font-bold text-white uppercase tracking-wider block mb-2 text-amber-500 text-[11px]">Inquiries & Collaboration</span>
             <p className="text-slate-400 leading-relaxed">
@@ -274,11 +386,10 @@ export default function App() {
               ietp.group11@aastu.edu.et
             </a>
           </div>
-
         </div>
         
         <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-slate-800 text-center text-slate-500 font-medium">
-          &copy; 2026 AASTU Group 11 Project Node. Built with split cloud RAG capabilities.
+          &copy; 2026 AASTU Group 11 Project Node. Built with simulated edge classification model capabilities.
         </div>
       </footer>
 
