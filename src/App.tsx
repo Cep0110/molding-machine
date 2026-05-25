@@ -1,116 +1,238 @@
- import React, { useState } from 'react';
-import { Brain, Cpu, ShieldCheck, Database, Send, Upload, ChevronRight, Activity } from 'lucide-react';
-import { classifyMaterial, queryKnowledgeBase } from './services/api';
+import React, { useState } from 'react';
 
 export default function App() {
-  const [activePage, setActivePage] = useState('home');
-  const[loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [ragQuery, setRagQuery] = useState('');
-  const [ragResult, setRagResult] = useState('');
+  // --- UI & INFERENCE STATE MANAGEMENT ---
+  const [analyzingImage, setAnalyzingImage] = useState(false);
+  const [inferenceResult, setInferenceResult] = useState(null);
+  const [outOfTopicError, setOutOfTopicError] = useState('');
+  const [selectedImagePreview, setSelectedImagePreview] = useState(null);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
-    setLoading(true);
-    try {
-      const data = await classifyMaterial(e.target.files[0]);
-      setResult(data);
-    } catch (err) { alert("Failed to connect to backend model."); }
-    setLoading(false);
+  // --- AUTOMATED INGESTION & PIPELINE ENGINE ---
+  const processBatchImage = async (e) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const file = e.target.files[0];
+    
+    // Create local image preview URL for the dashboard layout
+    setSelectedImagePreview(URL.createObjectURL(file));
+    
+    // Set UI processing status states
+    setAnalyzingImage(true);
+    setInferenceResult(null);
+    setOutOfTopicError('');
+
+    // Convert raw file stream into Base64 Data URL format string for transmission
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = async () => {
+      const base64Data = reader.result;
+
+      // Structure data matrix to match the Gradio client input payload rules
+      const payload = {
+        data: [ base64Data ] 
+      };
+
+      try {
+        // Query the active Hugging Face inference container node
+        const response = await fetch('https://yani-321212-me-backend.hf.space/api/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Cloud Server responded with status code: ${response.status}`);
+        }
+
+        const json = await response.json();
+        
+        // Extract the root array payload returned by Gradio
+        const data = json.data[0]; 
+
+        // Handle out-of-topic rejections or parse successful classifications
+        if (data.error) {
+          setOutOfTopicError(data.error);
+        } else {
+          setInferenceResult({
+            material: data.material,
+            confidence: data.confidence,
+            modelRef: 'polysmart_qa_model.pth [Active ResNet-18 Core Layer]',
+            recommendedTemp: data.recommendedTemp,
+            recommendedCooling: data.recommendedCooling,
+          });
+        }
+      } catch (err) {
+        setOutOfTopicError('❌ Connection Fault: Failed to establish data link to the Hugging Face AI node.');
+        console.error("Network Exception:", err);
+      } finally {
+        setAnalyzingImage(false);
+      }
+    };
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      {/* Professional Navbar */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold tracking-tight flex items-center gap-2 text-blue-900">
-            <Activity className="text-blue-600" /> POLYSMART-11
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 font-sans">
+      {/* HEADER BAND */}
+      <header className="max-w-6xl mx-auto mb-8 border-b border-slate-800 pb-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+            POLYSMART QA COCKPIT
           </h1>
-          <div className="flex gap-8 text-xs font-bold uppercase tracking-wider text-slate-600">
-            {['Home', 'Classifier', 'Knowledge-Base', 'Dashboard'].map(i => (
-              <button key={i} onClick={() => setActivePage(i.toLowerCase())} className="hover:text-blue-600 transition-colors">
-                {i}
-              </button>
-            ))}
-          </div>
+          <p className="text-xs text-slate-400 font-mono mt-1">
+            Integrated Engineering Project // Team Group 1
+          </p>
         </div>
-      </nav>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span className="text-xs font-mono text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1 rounded">
+            HF BACKEND LINK: ACTIVE
+          </span>
+        </div>
+      </header>
 
-      {/* Landing Hero Section */}
-      {activePage === 'home' && (
-        <main className="max-w-7xl mx-auto px-8 py-24">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <span className="text-blue-600 font-bold text-sm tracking-widest uppercase">Industrial Innovation</span>
-              <h1 className="text-6xl font-black mt-4 mb-6 leading-tight">Advanced Injection Molding <br/>Intelligence</h1>
-              <p className="text-lg text-slate-600 mb-8">
-                Optimizing polymer production through AI-driven material classification and intelligent RAG-based technical retrieval systems. Built by IETP Group 11.
-              </p>
-              <button onClick={() => setActivePage('classifier')} className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-blue-700 transition-all">
-                Launch System Portal <ChevronRight size={18} />
-              </button>
-            </div>
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl">
-              <div className="space-y-6">
-                <div className="flex gap-4 items-start">
-                  <Brain className="text-blue-500 mt-1" />
-                  <div>
-                    <h4 className="font-bold">PyTorch Integration</h4>
-                    <p className="text-sm text-slate-500">Real-time inference using fine-tuned model weights (polysmart_qa_model.pth).</p>
-                  </div>
+      <main className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {/* LEFT COLUMN: CAMERA FEED / IMAGE INGESTION */}
+        <section className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <h2 className="text-lg font-bold mb-2 flex items-center gap-2 text-blue-400">
+              📸 Machine Vision Material Capture
+            </h2>
+            <p className="text-xs text-slate-400 mb-4">
+              Upload a feedstock frame sample to analyze material type and configure barrel calibration values.
+            </p>
+            
+            {/* IMAGE PREVIEW DRAWER */}
+            <div className="border-2 border-dashed border-slate-800 rounded-lg h-64 bg-slate-950 flex items-center justify-center overflow-hidden relative group">
+              {selectedImagePreview ? (
+                <img 
+                  src={selectedImagePreview} 
+                  alt="Feedstock preview" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="text-center p-4">
+                  <span className="text-4xl block mb-2 text-slate-700">📥</span>
+                  <span className="text-xs text-slate-500 font-mono">No Image Mounted to System Scanner</span>
                 </div>
-                <div className="flex gap-4 items-start">
-                  <Database className="text-blue-500 mt-1" />
-                  <div>
-                    <h4 className="font-bold">RAG Retrieval</h4>
-                    <p className="text-sm text-slate-500">Vector database support for instant technical documentation access.</p>
-                  </div>
+              )}
+              
+              {/* LOADING INDICATOR MASK */}
+              {analyzingImage && (
+                <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center text-center p-4">
+                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                  <p className="text-sm font-bold text-blue-400 animate-pulse">RUNNING MODEL INFERENCE...</p>
+                  <p className="text-[10px] text-slate-500 font-mono mt-1">Evaluating weights matrix via ResNet-18 core</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* INPUT FORM BLOCK */}
+          <div className="mt-6">
+            <label className="block w-full bg-blue-600 hover:bg-blue-500 text-white font-medium text-center text-sm py-3 px-4 rounded-lg cursor-pointer transition shadow-lg shadow-blue-900/20">
+              {selectedImagePreview ? "🔄 Capture / Rescan Feedstock Frame" : "🔌 Initialize Vision Scanner"}
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={processBatchImage} 
+                className="hidden" 
+                disabled={analyzingImage}
+              />
+            </label>
+          </div>
+        </section>
+
+        {/* RIGHT COLUMN: CYLINDER CALIBRATION CONTROLS */}
+        <section className="flex flex-col gap-6">
+          
+          {/* TOP BOX: AUTOMATION PANEL */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl flex-1">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-400">
+              ⚙️ Automated Process Control Loop
+            </h2>
+
+            {/* ERROR BOUND ALERTS */}
+            {outOfTopicError && (
+              <div className="bg-red-950/40 border border-red-500/50 text-red-400 p-4 rounded-lg text-xs font-mono mb-4 leading-relaxed">
+                {outOfTopicError}
+              </div>
+            )}
+
+            {/* INITIAL BLANK PANEL STATE */}
+            {!inferenceResult && !outOfTopicError && !analyzingImage && (
+              <div className="h-48 border border-slate-800 rounded-lg bg-slate-950/50 flex items-center justify-center text-center p-6">
+                <p className="text-xs font-mono text-slate-500">
+                  Waiting for clean visual data input stream from material capture sensor...
+                </p>
+              </div>
+            )}
+
+            {/* AI LOADING PLACEHOLDER PANELS */}
+            {analyzingImage && (
+              <div className="space-y-3 animate-pulse">
+                <div className="h-6 bg-slate-800 rounded w-2/3"></div>
+                <div className="h-20 bg-slate-800 rounded"></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-16 bg-slate-800 rounded"></div>
+                  <div className="h-16 bg-slate-800 rounded"></div>
                 </div>
               </div>
-            </div>
-          </div>
-        </main>
-      )}
+            )}
 
-      {/* Classifier Integration */}
-      {activePage === 'classifier' && (
-        <main className="max-w-4xl mx-auto px-8 py-16">
-          <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center">
-            <h2 className="text-3xl font-black mb-2">Material Inference Module</h2>
-            <p className="text-slate-500 mb-10">Direct link to backend classification inference.</p>
-            
-            <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-slate-300 rounded-3xl cursor-pointer hover:bg-slate-50 transition-all">
-              <Upload className="mb-4 text-blue-500" size={40} />
-              <span className="font-bold">Upload Feedstock Matrix</span>
-              <input type="file" className="hidden" onChange={handleFileUpload} />
-            </label>
-            
-            {loading && <div className="mt-8 font-bold text-blue-600 animate-pulse">Running forward pass...</div>}
-          </div>
-        </main>
-      )}
+            {/* SUCCESSFUL MODEL OUTPUT LAYER DISPLAY */}
+            {inferenceResult && (
+              <div className="space-y-4">
+                <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block">Identified Target</span>
+                    <span className="text-[10px] font-mono text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                      {inferenceResult.modelRef}
+                    </span>
+                  </div>
+                  <div className="text-2xl font-black text-emerald-400 tracking-tight">
+                    {inferenceResult.material}
+                  </div>
+                  <div className="mt-2 text-xs font-mono flex items-center gap-2 text-slate-300">
+                    <span>🎯 Model Confidence Score:</span>
+                    <span className="text-emerald-400 font-bold">{inferenceResult.confidence}%</span>
+                  </div>
+                </div>
 
-      {/* RAG Knowledge Page */}
-      {activePage === 'knowledge-base' && (
-        <main className="max-w-3xl mx-auto px-8 py-16">
-          <div className="bg-slate-900 text-white p-12 rounded-3xl">
-            <h2 className="text-2xl font-black mb-6">Technical RAG Assistant</h2>
-            <div className="flex gap-4 mb-8">
-              <input 
-                className="flex-grow p-4 rounded-xl bg-slate-800 text-white focus:outline-none"
-                placeholder="Ask technical questions..."
-                value={ragQuery}
-                onChange={(e) => setRagQuery(e.target.value)}
-              />
-              <button onClick={async () => setRagResult(await queryKnowledgeBase(ragQuery))} className="bg-blue-600 p-4 rounded-xl">
-                <Send />
-              </button>
-            </div>
-            {ragResult && <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">{ragResult}</div>}
+                {/* AUTOMATED ACTUATOR REGULATION VALUE BLOCK */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4 text-center">
+                    <span className="text-xs font-mono text-slate-400 block uppercase mb-1">Cylinder Heating Setpoint</span>
+                    <span className="text-3xl font-black text-orange-400 font-mono tracking-tight">
+                      {inferenceResult.recommendedTemp}°C
+                    </span>
+                  </div>
+                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4 text-center">
+                    <span className="text-xs font-mono text-slate-400 block uppercase mb-1">Cooling Toggle Cycle</span>
+                    <span className="text-3xl font-black text-cyan-400 font-mono tracking-tight">
+                      {inferenceResult.recommendedCooling}s
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-emerald-950/20 border border-emerald-500/30 text-[11px] font-mono text-emerald-400 p-3 rounded-lg leading-relaxed">
+                  ✅ <strong>Cylinder Interlock Released:</strong> Parameters synchronized to the heating coils. Ready to feed raw granules into the injection plunger.
+                </div>
+              </div>
+            )}
           </div>
-        </main>
-      )}
+
+          {/* BOTTOM BOX: PROTOTYPE PROJECT SPECIFICATIONS RECAP */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs text-slate-400 font-mono grid grid-cols-2 gap-2 shadow-md">
+            <div>⚙️ Prototype: <span className="text-slate-200">v2.5 Tabletop Machine</span></div>
+            <div>📦 Max Shot Capacity: <span className="text-slate-200">10g Capacity</span></div>
+            <div>📍 Defense Node: <span className="text-slate-200">AASTU Block 57</span></div>
+            <div>👥 System Engineering: <span className="text-slate-200">Group 1 Team</span></div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
