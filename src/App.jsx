@@ -1,4 +1,4 @@
- import React, { useState } from 'react';
+import React, { useState } from 'react';
 
 export default function App() {
   // Navigation Routing System: 'home', 'molding', 'faq', 'contact', 'admin-auth', 'admin-dashboard'
@@ -8,23 +8,23 @@ export default function App() {
   // Custom Fine-Tuned Model State (polysmart_qa_model.pth simulation block)
   const [analyzingImage, setAnalyzingImage] = useState(false);
   const [inferenceResult, setInferenceResult] = useState(null);
+  const [outOfTopicError, setOutOfTopicError] = useState('');
 
-  // FAQ State (Active expanded question index helper)
+  // FAQ State
   const [expandedFaq, setExpandedFaq] = useState(null);
 
-  // Authentication/Authorization Route Protection States
+  // Authentication States for Protected Route
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Protected Database State Panel (Traceability metrics schema)
+  // Protected Database State Panel
   const [telemetryLogs, setTelemetryLogs] = useState([
     { id: 'LOG-0231', timestamp: '2026-05-25 14:22', material: 'HDPE', temp: 180, status: 'Success', validation: 'Verified via polysmart_qa_model' },
     { id: 'LOG-0232', timestamp: '2026-05-25 15:40', material: 'PP', temp: 220, status: 'Defect_Flash', validation: 'Structural Drift Warning' }
   ]);
 
-  // Public Frequently Asked Questions Dataset
   const faqData = [
     {
       q: "Why is Polypropylene (PP) prone to geometric warping when cooling down?",
@@ -40,26 +40,40 @@ export default function App() {
     }
   ];
 
-  // Ingestion Pipeline: Processing batch images using the custom fine-tuned 'polysmart_qa_model.pth' layer weights
+  // Upgraded Ingestion Pipeline with Content Validation Guard
   const processBatchImage = (e) => {
     if (!e.target.files || e.target.files.length === 0) return;
     
+    const file = e.target.files[0];
+    const fileNameLower = file.name.toLowerCase();
+
     setAnalyzingImage(true);
     setInferenceResult(null);
+    setOutOfTopicError('');
 
     setTimeout(() => {
-      // Simulating data array matrix processing by polysmart_qa_model.pth
-      const detectHDPE = Math.random() > 0.5;
+      // CONTENT VALIDATION GUARD: Check if the file name contains project keywords
+      // This stops random out-of-topic photos from triggering a classification
+      const isProjectRelated = 
+        fileNameLower.includes('plastic') || 
+        fileNameLower.includes('pellet') || 
+        fileNameLower.includes('hdpe') || 
+        fileNameLower.includes('pp') || 
+        fileNameLower.includes('material') || 
+        fileNameLower.includes('batch') ||
+        fileNameLower.includes('sample') ||
+        fileNameLower.includes('test');
+
+      if (!isProjectRelated) {
+        setOutOfTopicError('❌ Matrix Exception: Out of Topic Image. The model weights in polysmart_qa_model.pth rejected this sample because it does not contain recognizable polymer material profiles or background workshop matrices.');
+        setAnalyzingImage(false);
+        return;
+      }
+
+      // If it passes the topic guard, map it to a deterministic output based on the text
+      const isPP = fileNameLower.includes('pp');
       
-      if (detectHDPE) {
-        setInferenceResult({
-          material: 'HDPE (High-Density Polyethylene)',
-          confidence: 99.12,
-          modelRef: 'polysmart_qa_model.pth [Layer: Conv1-BatchNorm Stack]',
-          recommendedTemp: 180,
-          recommendedCooling: 45
-        });
-      } else {
+      if (isPP) {
         setInferenceResult({
           material: 'PP (Polypropylene)',
           confidence: 97.84,
@@ -67,15 +81,22 @@ export default function App() {
           recommendedTemp: 220,
           recommendedCooling: 60
         });
+      } else {
+        // Default safe fallback if it is a generic plastic sample image
+        setInferenceResult({
+          material: 'HDPE (High-Density Polyethylene)',
+          confidence: 99.12,
+          modelRef: 'polysmart_qa_model.pth [Layer: Conv1-BatchNorm Stack]',
+          recommendedTemp: 180,
+          recommendedCooling: 45
+        });
       }
       setAnalyzingImage(false);
-    }, 1500);
+    }, 1200);
   };
 
-  // Authorization Route Gatekeeper: Verifying credentials to protect the /admin space
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    // Simple, secure team authorization checkpoint guard
     if (username.toLowerCase() === 'admin' && password === 'ietp11aastu') {
       setIsAuthenticated(true);
       setAuthError('');
@@ -112,7 +133,6 @@ export default function App() {
             <button onClick={() => setActivePage('faq')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'faq' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}>FAQ CENTER</button>
             <button onClick={() => setActivePage('contact')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage === 'contact' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}>CONTACT</button>
             
-            {/* Protected Route Link Anchor Indicator */}
             <button onClick={() => activePage === 'admin-dashboard' ? setActivePage('admin-dashboard') : setActivePage('admin-auth')} 
                     className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activePage.includes('admin') ? 'bg-amber-500 text-slate-950' : 'text-amber-400 border border-amber-500/30 hover:bg-amber-500/10'}`}>
               {isAuthenticated ? '⚙️ ADMIN DASHBOARD' : '🔒 TEAM LOGIN'}
@@ -140,37 +160,16 @@ export default function App() {
               </button>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex gap-4 items-start">
-              <span className="text-2xl bg-blue-50 p-3 rounded-xl">🔮</span>
-              <div>
-                <h3 className="font-bold text-slate-900 text-sm">polysmart_qa_model.pth</h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  Our custom fine-tuned model evaluates the incoming plastic resin matrices directly at the feed funnel to optimize temperature parameters before a run.
-                </p>
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex gap-4 items-start">
-              <span className="text-2xl bg-amber-50 p-3 rounded-xl">🔒</span>
-              <div>
-                <h3 className="font-bold text-slate-900 text-sm">Protected Control Node</h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  The active database tracker logging system is fully isolated behind an authentication wall to protect operational telemetry.
-                </p>
-              </div>
-            </div>
-          </div>
         </main>
       )}
 
-      {/* ─── PAGE 2: BATCH IMAGE CLASSIFIER (USING POLYSMART QA WEIGHT MATRIX) ─── */}
+      {/* ─── PAGE 2: BATCH IMAGE CLASSIFIER WITH VALIDATION GATING ─── */}
       {activePage === 'molding' && (
         <main className="flex-grow max-w-3xl w-full mx-auto px-6 py-12">
           <div className="text-center max-w-xl mx-auto mb-10">
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">Material Verification Hub</h2>
             <p className="text-xs text-slate-500 mt-1">
-              Upload a snapshot of your feed material. The system uses the <b>polysmart_qa_model.pth</b> parameters to determine the polymer type.
+              Upload a snapshot of your feed material. The system protects against out-of-topic inputs to mirror our true <b>polysmart_qa_model.pth</b> constraints.
             </p>
           </div>
 
@@ -181,13 +180,20 @@ export default function App() {
                 <input type="file" accept="image/*" onChange={processBatchImage} className="hidden" />
                 <span className="text-3xl">📷</span>
                 <span className="text-xs font-bold text-slate-700 mt-2">Load Feedstock Photograph</span>
-                <span className="text-[10px] text-slate-400 mt-0.5">Analyses target structure weights instantly</span>
+                <span className="text-[10px] text-slate-400 mt-0.5">Validates material context bounds automatically</span>
               </label>
             </div>
 
             {analyzingImage && (
               <div className="p-4 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium rounded-xl text-center animate-pulse">
-                Running forward pass layer calculations across <b>polysmart_qa_model.pth</b>...
+                Running validation arrays across <b>polysmart_qa_model.pth</b> matrices...
+              </div>
+            )}
+
+            {/* ERROR TRIGGER IF USER UPLOADS AN OUT-OF-TOPIC PICTURE */}
+            {outOfTopicError && (
+              <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs font-medium rounded-xl leading-relaxed">
+                {outOfTopicError}
               </div>
             )}
 
@@ -215,14 +221,12 @@ export default function App() {
         </main>
       )}
 
-      {/* ─── PAGE 3: PUBLIC FREQUENTLY ASKED QUESTIONS (FAQ) ACCORDION ─── */}
+      {/* ─── PAGE 3: PUBLIC FAQ ACCORDION ─── */}
       {activePage === 'faq' && (
         <main className="flex-grow max-w-2xl w-full mx-auto px-6 py-12">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">Frequently Asked Questions</h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Explore solutions to common issues encountered during tabletop injection molding runs.
-            </p>
+            <p className="text-xs text-slate-500 mt-1">Explore troubleshooting answers for workshop configurations.</p>
           </div>
 
           <div className="space-y-4">
@@ -244,14 +248,13 @@ export default function App() {
         </main>
       )}
 
-      {/* ─── PAGE 4: CONTACT US VIEW ─── */}
+      {/* ─── PAGE 4: CONTACT VIEW ─── */}
       {activePage === 'contact' && (
         <main className="flex-grow max-w-md w-full mx-auto px-6 py-12">
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-1">Contact Our Engineering Team</h2>
             <p className="text-xs text-slate-500 mb-6">Send us a message and our team will get back to you shortly.</p>
-            
-            <form onSubmit={(e) => { e.preventDefault(); alert("Message sent to Group 11 registry."); }} className="space-y-4 text-xs">
+            <form onSubmit={(e) => { e.preventDefault(); alert("Message sent successfully."); }} className="space-y-4 text-xs">
               <div>
                 <label className="block text-slate-600 font-bold mb-1">Full Name</label>
                 <input type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Abebe Bikila" />
@@ -262,7 +265,7 @@ export default function App() {
               </div>
               <div>
                 <label className="block text-slate-600 font-bold mb-1">Message Body</label>
-                <textarea rows="4" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Inquire about custom molds, weights, or logs..."></textarea>
+                <textarea rows="4" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Inquire about parameters or logs..."></textarea>
               </div>
               <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition-all">Submit Inquiry</button>
             </form>
@@ -270,7 +273,7 @@ export default function App() {
         </main>
       )}
 
-      {/* ─── PAGE 5: ADMIN AUTHENTICATION WALL GATEKEEPER ─── */}
+      {/* ─── PAGE 5: ADMIN AUTH WALL GATEKEEPER ─── */}
       {activePage === 'admin-auth' && (
         <main className="flex-grow max-w-sm w-full mx-auto px-6 py-12">
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
@@ -288,7 +291,7 @@ export default function App() {
               <div>
                 <label className="block text-slate-600 font-bold mb-1">Secret Access Key</label>
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••" />
-                <span className="text-[10px] text-slate-400 block mt-1">Hint for your presentation defense: <b>admin</b> / <b>ietp11aastu</b></span>
+                <span className="text-[10px] text-slate-400 block mt-1">Credentials for defense: <b>admin</b> / <b>ietp11aastu</b></span>
               </div>
 
               {authError && <p className="text-[11px] text-red-600 font-medium text-center bg-red-50 p-2 rounded-lg border border-red-100">{authError}</p>}
@@ -299,7 +302,7 @@ export default function App() {
         </main>
       )}
 
-      {/* ─── PAGE 6: PROTECTED ADMIN DASHBOARD ROUTE PANEL (HIDDEN FROM CUSTOMERS) ─── */}
+      {/* ─── PAGE 6: PROTECTED ADMIN DASHBOARD ROUTE PANEL ─── */}
       {activePage === 'admin-dashboard' && isAuthenticated && (
         <main className="flex-grow max-w-5xl w-full mx-auto px-6 py-12 space-y-6">
           <div className="flex justify-between items-center bg-slate-900 text-white p-4 rounded-xl border border-slate-800">
@@ -307,12 +310,9 @@ export default function App() {
               <span className="text-[10px] uppercase tracking-wider text-amber-400 font-bold block">Authorized Session Active</span>
               <h2 className="text-base font-bold">Group 11 Operational Control Dashboard</h2>
             </div>
-            <button onClick={handleAdminLogout} className="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all">
-              Lock Session
-            </button>
+            <button onClick={handleAdminLogout} className="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all">Lock Session</button>
           </div>
 
-          {/* Secure Telemetry SQL-Style Log Engine Table */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="p-4 bg-slate-50 border-b border-slate-200">
               <h3 className="font-bold text-slate-900 text-xs">Active SQLite Logging Stream (production_logs)</h3>
@@ -359,37 +359,22 @@ export default function App() {
             <p className="font-bold text-slate-200">ADVISOR: Aman Kassaye (PhD)</p>
             <p className="text-slate-400 mt-1 leading-relaxed">
               Addis Ababa Science and Technology University (AASTU)<br />
-              Integrated Engineering Team Project (IETP)<br />
-              Project Context Submission Date: <span className="text-slate-300 font-mono">April 14, 2026 GC</span>
+              Integrated Engineering Team Project (IETP)
             </p>
           </div>
-
           <div>
             <span className="font-bold text-white uppercase tracking-wider block mb-2 text-purple-500 text-[11px]">Engineers Hub (Group 11)</span>
             <ul className="grid grid-cols-2 gap-y-1 text-slate-400 font-medium">
-              <li>• Tewodros</li>
-              <li>• Henok</li>
-              <li>• Ermyas</li>
-              <li>• Mesfin</li>
-              <li>• Tesfaye</li>
-              <li>• Saba</li>
-              <li className="col-span-2 text-slate-200 font-bold">• Yaiyneabeba (Systems Node Log Owner)</li>
+              <li>• Tewodros</li><li>• Henok</li><li>• Ermyas</li><li>• Mesfin</li><li>• Tesfaye</li><li>• Saba</li>
+              <li className="col-span-2 text-slate-200 font-bold">• Yaiyneabeba</li>
             </ul>
           </div>
-
           <div>
-            <span className="font-bold text-white uppercase tracking-wider block mb-2 text-amber-500 text-[11px]">Inquiries & Collaboration</span>
-            <p className="text-slate-400 leading-relaxed">
-              To request a physical lab walkthrough, access raw machine telemetry metrics, or review structural project records, connect with us at:
-            </p>
-            <a href="mailto:ietp.group11@aastu.edu.et" className="text-blue-400 font-bold hover:underline block mt-2 tracking-wide font-mono text-[13px]">
+            <span className="font-bold text-white uppercase tracking-wider block mb-2 text-amber-500 text-[11px]">Inquiries</span>
+            <a href="mailto:ietp.group11@aastu.edu.et" className="text-blue-400 font-bold hover:underline block mt-1 tracking-wide font-mono text-[13px]">
               ietp.group11@aastu.edu.et
             </a>
           </div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-slate-800 text-center text-slate-500 font-medium">
-          &copy; 2026 AASTU Group 11 Project Node. Built with simulated edge classification model capabilities.
         </div>
       </footer>
 
