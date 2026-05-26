@@ -32,10 +32,10 @@ export default function App() {
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [contactSuccess, setContactSuccess] = useState(false);
 
-  // Directly points to your specified Hugging Face Space endpoint
+  // Points to your backend endpoint
   const BACKEND_URL = 'https://yani-321212-me-backend.hf.space';
 
-  // --- RAG Knowledge Base System (Strictly excludes internal polymer references) ---
+  // --- RAG Knowledge Base System ---
   const RAG_KNOWLEDGE_BASE = {
     "how does the system contribute to the environment?": "EcoSpark transforms post-consumer waste materials into structural products, localizing production pipelines and satisfying global circular manufacturing protocols.",
     "what are the purchase and shipping options?": "The EcoSpark industrial rig is distributed as a turnkey manufacturing cell. Custom modifications and procurement options can be initiated directly via our Marketplace panel.",
