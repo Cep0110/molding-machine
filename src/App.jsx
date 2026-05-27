@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -19,32 +19,40 @@ export default function App() {
   ]);
   const [userInput, setUserInput] = useState('');
 
-  // Pre-seeded Logs for Admin View
-  const [classificationLogs, setClassificationLogs] = useState([
-    { timestamp: '10:14:22 AM', material: 'PP Resin', confidence: '94.2%', status: 'Approved' },
-    { timestamp: '11:02:15 AM', material: 'Cellulose Matrix', confidence: '98.7%', status: 'Rejected (Safety Interlock)' }
-  ]);
-  const [customerInquiries, setCustomerInquiries] = useState([
-    { name: 'Abdi Kefele', email: 'abdi@aastu.edu.et', msg: 'Interested in acquiring 3 automated EcoSpark processing rigs for an industrial site in Hawassa.' }
-  ]);
+  // --- Dynamic Tracking States (Replaces Static Logs) ---
+  const [classificationLogs, setClassificationLogs] = useState([]);
+  const [customerInquiries, setCustomerInquiries] = useState([]);
 
   // Contact Form States
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [contactSuccess, setContactSuccess] = useState(false);
 
-  // Points to your backend endpoint
+  // Directly points to your live Hugging Face Space subdomain endpoint
   const BACKEND_URL = 'https://yani-321212-me-backend.hf.space';
 
-  // --- RAG Knowledge Base System ---
+  // --- Expanded RAG Knowledge Base System ---
   const RAG_KNOWLEDGE_BASE = {
-    "how does the system contribute to the environment?": "EcoSpark transforms post-consumer waste materials into structural products, localizing production pipelines and satisfying global circular manufacturing protocols.",
-    "what are the purchase and shipping options?": "The EcoSpark industrial rig is distributed as a turnkey manufacturing cell. Custom modifications and procurement options can be initiated directly via our Marketplace panel.",
-    "can this machine operate continuously?": "Yes, our hardware is designed with industrial-grade thermal blocks and automated feed screws, making it fully ready for continuous cyclic micro-factory deployment.",
-    "where is this project engineered?": "The system is engineered at Addis Ababa Science and Technology University (AASTU) under the Integrated Engineering Team Project initiative."
+    "how does the system contribute to the environment?": "EcoSpark transforms post-consumer waste materials into structural products, localizing production pipelines and satisfying global circular manufacturing protocols by keeping high-density plastics inside local production loops.",
+    "what are the purchase and shipping options?": "The EcoSpark industrial rig is distributed as a turnkey manufacturing cell. Custom modifications, pricing tiers, and procurement options can be initiated directly by submitting an inquiry to our technical team via the contact command module.",
+    "can this machine operate continuously?": "Yes, our hardware is designed with industrial-grade thermal blocks, automated feed screws, and active cooling loops, making it fully ready for continuous cyclic micro-factory deployments.",
+    "where is this project engineered?": "The system is engineered at Addis Ababa Science and Technology University (AASTU) under the Integrated Engineering Team Project initiative.",
+    "what are the core components of the mechanical assembly?": "The rig consists of a high-torque mechanical reduction hopper feed, a dual-zone heated barrel assembly utilizing precision band heaters, a heavy-duty compression mold assembly, and a vision-guided sorting stage.",
+    "how is thermal control maintained?": "Thermal states are maintained using industrial PID temperature controllers connected to K-type thermocouples, allowing automated adjustments between 180°C and 260°C depending on the specific polymer profile identified.",
+    "what structural artifacts can it produce?": "It produces high-density structural interlocking building modules, retaining wall blocks, paving tiles, and customizable composite matrix panels designed for load-bearing urban infrastructure grids.",
+    "what is the group composition?": "This project is designed and deployed by the Integrated Engineering Team Project (IETP) Group 11 engineering cluster.",
+    "how does the computer vision model classify items?": "The engine captures raw matrix visual inputs at the ingestion intake gate, pipes the binary data over an encrypted API channel to a fine-tuned deep learning image classification space, and checks the composition map against known material profiles.",
+    "what happens to foreign or unapproved materials?": "If a non-plastic matrix, hazardous compound, or unapproved material is detected by the vision model, the system immediately flags a security tripwire exception, rejects the sample, and locks down the feed screw via an electronic safety interlock."
   };
 
   const handleFAQClick = (question) => {
     const answer = RAG_KNOWLEDGE_BASE[question.toLowerCase()];
+    
+    // Log user query to the admin dashboard panel dynamically
+    setCustomerInquiries(prev => [
+      { name: 'Anonymous User', email: 'Internal RAG Route', msg: `Clicked Quick FAQ: "${question}"` },
+      ...prev
+    ]);
+
     setChatMessages(prev => [
       ...prev,
       { sender: 'user', text: question },
@@ -56,8 +64,15 @@ export default function App() {
     e.preventDefault();
     if (!userInput.trim()) return;
 
-    const userQuery = userInput.trim().toLowerCase();
+    const originalInput = userInput.trim();
+    const userQuery = originalInput.toLowerCase();
     let botResponse = "I cannot locate specific operational logs regarding that parameter in my external knowledge base directory. Please contact an EcoSpark system architect for deep architectural data.";
+
+    // Track ACTUAL user questions inside the dashboard live state
+    setCustomerInquiries(prev => [
+      { name: 'Web Assistant User', email: 'Interactive Search Query', msg: originalInput },
+      ...prev
+    ]);
 
     for (let key in RAG_KNOWLEDGE_BASE) {
       if (userQuery.includes(key) || key.includes(userQuery)) {
@@ -66,7 +81,7 @@ export default function App() {
       }
     }
 
-    setChatMessages(prev => [...prev, { sender: 'user', text: userInput }, { sender: 'bot', text: botResponse }]);
+    setChatMessages(prev => [...prev, { sender: 'user', text: originalInput }, { sender: 'bot', text: botResponse }]);
     setUserInput('');
   };
 
@@ -108,20 +123,41 @@ export default function App() {
 
       if (payload.error) {
         setClassifierError(payload.error);
-      } else {
-        setInferenceResult(payload);
+        // Log error dynamically to dashboard
         setClassificationLogs(prev => [
           { 
             timestamp: new Date().toLocaleTimeString(), 
-            material: payload.detected_material, 
-            confidence: `${payload.confidence}%`, 
-            status: payload.is_plastic ? 'Approved' : 'Rejected' 
+            material: 'Processing Error', 
+            confidence: '0.0%', 
+            status: 'Fault Triggered' 
+          },
+          ...prev
+        ]);
+      } else {
+        setInferenceResult(payload);
+        
+        // DYNAMICALLY track classification details into state
+        setClassificationLogs(prev => [
+          { 
+            timestamp: new Date().toLocaleTimeString(), 
+            material: payload.detected_material || 'Unknown Polymer', 
+            confidence: `${payload.confidence || '90.0'}%`, 
+            status: payload.is_plastic ? 'Approved Input' : 'Rejected Material' 
           },
           ...prev
         ]);
       }
     } catch (err) {
       setClassifierError('Failed to establish unified connection to the Hugging Face hardware space cluster.');
+      setClassificationLogs(prev => [
+        { 
+          timestamp: new Date().toLocaleTimeString(), 
+          material: 'API Offline Timeout', 
+          confidence: 'N/A', 
+          status: 'Connection Broken' 
+        },
+        ...prev
+      ]);
       console.error(err);
     } finally {
       setAnalyzing(false);
@@ -131,7 +167,13 @@ export default function App() {
   const handleContactSubmit = (e) => {
     e.preventDefault();
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
-    setCustomerInquiries(prev => [...prev, { name: contactForm.name, email: contactForm.email, msg: contactForm.message }]);
+    
+    // Dynamic submission tracking straight to dashboard array
+    setCustomerInquiries(prev => [
+      { name: contactForm.name, email: contactForm.email, msg: contactForm.message },
+      ...prev
+    ]);
+    
     setContactSuccess(true);
     setContactForm({ name: '', email: '', message: '' });
     setTimeout(() => setContactSuccess(false), 4000);
@@ -148,14 +190,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 font-sans flex flex-col justify-between selection:bg-teal-500/30">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col justify-between selection:bg-teal-200">
       
       {/* GLOBAL NAVIGATION LAYER */}
-      <nav className="bg-[#0c1222] border-b border-slate-800 px-6 py-4 sticky top-0 z-50">
+      <nav className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex flex-col items-center md:items-start">
-            <span className="text-2xl font-black tracking-tighter text-teal-400 italic">ECOSPARK</span>
-            <span className="text-[10px] font-mono tracking-widest text-slate-400 mt-0.5">AASTU IETP PROJECT // GROUP 11</span>
+            <span className="text-2xl font-black tracking-tighter text-teal-600 italic">ECOSPARK</span>
+            <span className="text-[10px] font-mono tracking-widest text-slate-500 mt-0.5">AASTU IETP PROJECT // GROUP 11</span>
           </div>
 
           <div className="flex flex-wrap justify-center gap-2">
@@ -163,7 +205,7 @@ export default function App() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all ${activeTab === tab ? 'bg-teal-600 text-white shadow-lg shadow-teal-900/30' : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
+                className={`px-4 py-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all ${activeTab === tab ? 'bg-teal-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
               >
                 {tab}
               </button>
@@ -179,48 +221,48 @@ export default function App() {
         {activeTab === 'home' && (
           <div className="space-y-16">
             <header className="text-center max-w-4xl mx-auto space-y-4 py-8">
-              <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-400 to-blue-500">
-                Transforming Secondary Polymers Into Architectural Value
+              <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900">
+                Transforming Secondary Polymers Into <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-600">Architectural Value</span>
               </h2>
-              <p className="text-slate-400 text-lg md:text-xl font-light leading-relaxed">
+              <p className="text-slate-600 text-lg md:text-xl font-light leading-relaxed">
                 Empowering localized circular macro-economies through high-precision computerized micro-extrusion systems designed for distributed community manufacturing applications.
               </p>
               <div className="pt-6 flex flex-wrap justify-center gap-4">
-                <button onClick={() => setActiveTab('classifier')} className="px-6 py-3 bg-teal-600 hover:bg-teal-500 text-sm font-bold rounded-xl transition shadow-lg shadow-teal-900/20">
+                <button onClick={() => setActiveTab('classifier')} className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold rounded-xl transition shadow-md">
                   Launch Ingestion Scanner
                 </button>
-                <button onClick={() => setActiveTab('marketplace')} className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-sm font-bold border border-slate-800 rounded-xl transition">
+                <button onClick={() => setActiveTab('marketplace')} className="px-6 py-3 bg-white hover:bg-slate-100 text-slate-700 text-sm font-bold border border-slate-200 rounded-xl transition shadow-sm">
                   Explore Machine Specifications
                 </button>
               </div>
             </header>
 
             {/* UN SDG IMPERATIVE VALUES */}
-            <section className="bg-[#0c1222] border border-slate-800 rounded-3xl p-8 shadow-2xl">
+            <section className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
               <div className="mb-8">
-                <h3 className="text-xs font-mono uppercase tracking-widest text-teal-400">IMPACT METRIC VERIFICATION</h3>
-                <h4 className="text-2xl font-bold text-white mt-1">Engineering Values Measured Against UN SDGs</h4>
+                <h3 className="text-xs font-mono uppercase tracking-widest text-teal-600 font-bold">IMPACT METRIC VERIFICATION</h3>
+                <h4 className="text-2xl font-bold text-slate-900 mt-1">Engineering Values Measured Against UN SDGs</h4>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-slate-950/50 p-6 rounded-2xl border border-slate-800/60">
-                  <div className="text-3xl font-black text-amber-500 mb-2">SDG 8</div>
-                  <div className="text-sm font-bold text-slate-200">Decent Work & Growth</div>
-                  <p className="text-xs text-slate-400 mt-2 font-light">Enables community level manufacturing jobs via localized high-yield tooling infrastructure systems.</p>
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                  <div className="text-3xl font-black text-amber-600 mb-2">SDG 8</div>
+                  <div className="text-sm font-bold text-slate-800">Decent Work & Growth</div>
+                  <p className="text-xs text-slate-600 mt-2 font-normal leading-relaxed">Enables community level manufacturing jobs via localized high-yield tooling infrastructure systems.</p>
                 </div>
-                <div className="bg-slate-950/50 p-6 rounded-2xl border border-slate-800/60">
-                  <div className="text-3xl font-black text-orange-500 mb-2">SDG 9</div>
-                  <div className="text-sm font-bold text-slate-200">Industry & Innovation</div>
-                  <p className="text-xs text-slate-400 mt-2 font-light">Integrates computer vision networks directly with raw processing mechanical rigs.</p>
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                  <div className="text-3xl font-black text-orange-600 mb-2">SDG 9</div>
+                  <div className="text-sm font-bold text-slate-800">Industry & Innovation</div>
+                  <p className="text-xs text-slate-600 mt-2 font-normal leading-relaxed">Integrates computer vision networks directly with raw processing mechanical rigs.</p>
                 </div>
-                <div className="bg-slate-950/50 p-6 rounded-2xl border border-slate-800/60">
-                  <div className="text-3xl font-black text-yellow-500 mb-2">SDG 11</div>
-                  <div className="text-sm font-bold text-slate-200">Sustainable Cities</div>
-                  <p className="text-xs text-slate-400 mt-2 font-light">Mitigates urban raw municipal density indices by converting solid materials directly within city cores.</p>
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                  <div className="text-3xl font-black text-yellow-600 mb-2">SDG 11</div>
+                  <div className="text-sm font-bold text-slate-800">Sustainable Cities</div>
+                  <p className="text-xs text-slate-600 mt-2 font-normal leading-relaxed">Mitigates urban raw municipal density indices by converting solid materials directly within city cores.</p>
                 </div>
-                <div className="bg-slate-950/50 p-6 rounded-2xl border border-slate-800/60">
-                  <div className="text-3xl font-black text-green-500 mb-2">SDG 12</div>
-                  <div className="text-sm font-bold text-slate-200">Responsible Consumption</div>
-                  <p className="text-xs text-slate-400 mt-2 font-light">Locks open lifecycle loops by converting waste streams into structural artifacts.</p>
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                  <div className="text-3xl font-black text-green-600 mb-2">SDG 12</div>
+                  <div className="text-sm font-bold text-slate-800">Responsible Consumption</div>
+                  <p className="text-xs text-slate-600 mt-2 font-normal leading-relaxed">Locks open lifecycle loops by converting waste streams into structural artifacts.</p>
                 </div>
               </div>
             </section>
@@ -228,8 +270,8 @@ export default function App() {
             {/* PROCESS TIMELINE */}
             <section className="space-y-8">
               <div className="text-center">
-                <h3 className="text-xs font-mono uppercase tracking-widest text-teal-400">OPERATIONAL FLOW PIPELINE</h3>
-                <h4 className="text-3xl font-black text-white mt-1">The Lifecycle Pipeline Process</h4>
+                <h3 className="text-xs font-mono uppercase tracking-widest text-teal-600 font-bold">OPERATIONAL FLOW PIPELINE</h3>
+                <h4 className="text-3xl font-black text-slate-900 mt-1">The Lifecycle Pipeline Process</h4>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
                 {[
@@ -238,28 +280,28 @@ export default function App() {
                   { step: '03', title: 'Controlled Extrusion', desc: 'Precision PID feedback induction bands safely melt verified resins down the drive barrel.' },
                   { step: '04', title: 'Final Compression Mold', desc: 'The liquefied composition settles into dense heavy-duty engineering modules under structural load.' }
                 ].map((p, idx) => (
-                  <div key={idx} className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 relative">
-                    <span className="text-5xl font-black text-slate-800/50 absolute top-4 right-4 font-mono">{p.step}</span>
-                    <h5 className="text-lg font-bold text-teal-400 mt-4">{p.title}</h5>
-                    <p className="text-xs text-slate-400 mt-2 leading-relaxed font-light">{p.desc}</p>
+                  <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-200 relative shadow-sm">
+                    <span className="text-5xl font-black text-slate-100 absolute top-4 right-4 font-mono">{p.step}</span>
+                    <h5 className="text-lg font-bold text-teal-600 mt-4 relative z-10">{p.title}</h5>
+                    <p className="text-xs text-slate-600 mt-2 leading-relaxed font-normal relative z-10">{p.desc}</p>
                   </div>
                 ))}
               </div>
-              <div className="bg-gradient-to-r from-teal-950/40 to-blue-950/40 border border-teal-900/40 p-8 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-6">
+              <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 p-8 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-6">
                 <div>
-                  <h5 className="text-lg font-bold text-white">System Verification Check Status: Clear</h5>
-                  <p className="text-xs text-slate-400 mt-1">Ready to inspect automated output metrics? Advance straight to the active machine cluster catalog display window.</p>
+                  <h5 className="text-lg font-bold text-slate-900">System Verification Check Status: Clear</h5>
+                  <p className="text-xs text-slate-600 mt-1">Ready to inspect automated output metrics? Advance straight to the active machine cluster catalog display window.</p>
                 </div>
-                <button onClick={() => setActiveTab('marketplace')} className="px-6 py-3 bg-teal-600 hover:bg-teal-500 text-xs font-bold uppercase tracking-wider rounded-xl transition whitespace-nowrap">
+                <button onClick={() => setActiveTab('marketplace')} className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition whitespace-nowrap shadow-sm">
                   Navigate to Machine Showcase
                 </button>
               </div>
             </section>
 
             {/* CONTACT FRAMEWORK */}
-            <section id="contact" className="max-w-2xl mx-auto bg-[#0c1222] border border-slate-800 p-8 rounded-3xl shadow-xl">
-              <h4 className="text-xl font-bold text-white mb-2 text-center">Contact Technical Command</h4>
-              <p className="text-xs text-slate-400 text-center mb-6">Submit queries directly to the engineering team repository pipeline.</p>
+            <section id="contact" className="max-w-2xl mx-auto bg-white border border-slate-200 p-8 rounded-3xl shadow-sm">
+              <h4 className="text-xl font-bold text-slate-900 mb-2 text-center">Contact Technical Command</h4>
+              <p className="text-xs text-slate-500 text-center mb-6">Submit queries directly to the engineering team repository pipeline.</p>
               <form onSubmit={handleContactSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input
@@ -267,14 +309,14 @@ export default function App() {
                     placeholder="Full Name"
                     value={contactForm.name}
                     onChange={e => setContactForm({...contactForm, name: e.target.value})}
-                    className="bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 transition"
+                    className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 text-slate-800 transition"
                   />
                   <input
                     type="email"
                     placeholder="Inquiry Email Address"
                     value={contactForm.email}
                     onChange={e => setContactForm({...contactForm, email: e.target.value})}
-                    className="bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 transition"
+                    className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 text-slate-800 transition"
                   />
                 </div>
                 <textarea
@@ -282,13 +324,13 @@ export default function App() {
                   placeholder="Specify system inquiry data parameters..."
                   value={contactForm.message}
                   onChange={e => setContactForm({...contactForm, message: e.target.value})}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 transition"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 text-slate-800 transition"
                 ></textarea>
-                <button type="submit" className="w-full py-3 bg-teal-600 hover:bg-teal-500 text-sm font-bold rounded-xl transition">
+                <button type="submit" className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold rounded-xl transition shadow-sm">
                   Transmit Telemetry Package
                 </button>
                 {contactSuccess && (
-                  <div className="bg-emerald-950/40 border border-emerald-800 text-emerald-400 p-3 rounded-xl text-center text-xs font-mono">
+                  <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-xl text-center text-xs font-mono">
                     ✅ Data packet transmitted successfully to AASTU Block 57.
                   </div>
                 )}
@@ -299,19 +341,19 @@ export default function App() {
 
         {/* AI ASSISTANT (RAG SYSTEM) */}
         {activeTab === 'chatbot' && (
-          <div className="max-w-4xl mx-auto bg-[#0c1222] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[600px]">
-            <div className="bg-slate-900/60 p-6 border-b border-slate-800 flex justify-between items-center">
+          <div className="max-w-4xl mx-auto bg-white border border-slate-200 rounded-3xl shadow-md overflow-hidden flex flex-col h-[600px]">
+            <div className="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-bold text-white">EcoSpark Retrieval-Augmented System</h3>
-                <p className="text-xs text-slate-400 font-mono">Knowledge Base Core Node // Verified RAG Pipeline Active</p>
+                <h3 className="text-lg font-bold text-slate-900">EcoSpark Retrieval-Augmented System</h3>
+                <p className="text-xs text-slate-500 font-mono">Knowledge Base Core Node // Verified RAG Pipeline Active</p>
               </div>
-              <div className="w-2 h-2 rounded-full bg-teal-400 animate-ping"></div>
+              <div className="w-2 h-2 rounded-full bg-teal-500 animate-ping"></div>
             </div>
 
-            <div className="flex-grow p-6 overflow-y-auto space-y-4 bg-slate-950/50">
+            <div className="flex-grow p-6 overflow-y-auto space-y-4 bg-slate-50/30">
               {chatMessages.map((m, idx) => (
                 <div key={idx} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-xl p-4 rounded-2xl text-sm leading-relaxed ${m.sender === 'user' ? 'bg-teal-600 text-white rounded-tr-none' : 'bg-slate-900 border border-slate-800 text-slate-300 rounded-tl-none'}`}>
+                  <div className={`max-w-xl p-4 rounded-2xl text-sm leading-relaxed ${m.sender === 'user' ? 'bg-teal-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 text-slate-700 rounded-tl-none shadow-sm'}`}>
                     {m.text}
                   </div>
                 </div>
@@ -319,19 +361,22 @@ export default function App() {
             </div>
 
             {/* PRESET SUGGESTIONS FOR CONSUMERS */}
-            <div className="p-4 bg-slate-900/40 border-t border-slate-800">
-              <span className="text-[10px] uppercase tracking-wider font-mono text-slate-400 block mb-2">Select Frequent Ingestion Query Parameters:</span>
-              <div className="flex flex-wrap gap-2">
+            <div className="p-4 bg-slate-50 border-t border-slate-200">
+              <span className="text-[10px] uppercase tracking-wider font-mono text-slate-500 block mb-2 font-bold">Select Frequent Ingestion Query Parameters:</span>
+              <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
                 {[
                   "How does the system contribute to the environment?",
                   "What are the purchase and shipping options?",
                   "Can this machine operate continuously?",
-                  "Where is this project engineered?"
+                  "Where is this project engineered?",
+                  "What are the core components of the mechanical assembly?",
+                  "How is thermal control maintained?",
+                  "What structural artifacts can it produce?"
                 ].map((q, i) => (
                   <button
                     key={i}
                     onClick={() => handleFAQClick(q)}
-                    className="bg-slate-950 hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-lg text-xs text-teal-400 font-medium transition"
+                    className="bg-white hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-xs text-teal-600 font-medium transition shadow-sm"
                   >
                     {q}
                   </button>
@@ -339,15 +384,15 @@ export default function App() {
               </div>
             </div>
 
-            <form onSubmit={handleSendMessage} className="p-4 bg-slate-900 border-t border-slate-800 flex gap-2">
+            <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-slate-200 flex gap-2">
               <input
                 type="text"
-                placeholder="Ask our semantic RAG engine customer service questions..."
+                placeholder="Ask our semantic RAG engine technical or project questions..."
                 value={userInput}
                 onChange={e => setUserInput(e.target.value)}
-                className="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-teal-500 text-slate-200"
+                className="flex-grow bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-teal-500 text-slate-800"
               />
-              <button type="submit" className="px-6 bg-teal-600 hover:bg-teal-500 rounded-xl font-bold text-sm transition">
+              <button type="submit" className="px-6 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-sm transition shadow-sm">
                 Query
               </button>
             </form>
@@ -357,34 +402,34 @@ export default function App() {
         {/* CLASSIFIER INTAKE STATION */}
         {activeTab === 'classifier' && (
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-            <section className="bg-[#0c1222] border border-slate-800 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+            <section className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col justify-between shadow-sm">
               <div>
                 <div className="mb-4">
-                  <h3 className="text-xs font-mono uppercase tracking-widest text-teal-400">MACHINE VISION PORTAL</h3>
-                  <h4 className="text-xl font-bold text-white mt-0.5">Physical Aggregate Target Core Ingestion</h4>
+                  <h3 className="text-xs font-mono uppercase tracking-widest text-teal-600 font-bold">MACHINE VISION PORTAL</h3>
+                  <h4 className="text-xl font-bold text-slate-900 mt-0.5">Physical Aggregate Target Core Ingestion</h4>
                 </div>
 
-                <div className="border-2 border-dashed border-slate-800 bg-slate-950 rounded-2xl h-72 flex flex-col items-center justify-center relative overflow-hidden p-4">
+                <div className="border-2 border-dashed border-slate-200 bg-slate-50 rounded-2xl h-72 flex flex-col items-center justify-center relative overflow-hidden p-4">
                   {imagePreview ? (
                     <img src={imagePreview} alt="Target component feed" className="w-full h-full object-contain rounded-xl" />
                   ) : (
                     <div className="text-center space-y-2">
                       <span className="text-5xl block">📷</span>
-                      <span className="text-xs text-slate-500 font-mono">Mount Active Material Feed Layer</span>
+                      <span className="text-xs text-slate-400 font-mono">Mount Active Material Feed Layer</span>
                     </div>
                   )}
 
                   {analyzing && (
-                    <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center space-y-3">
-                      <div className="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-xs font-mono tracking-widest text-teal-400 animate-pulse">EXECUTING CLASSIFICATION PASS...</span>
+                    <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center space-y-3">
+                      <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-xs font-mono tracking-widest text-teal-600 font-bold animate-pulse">EXECUTING CLASSIFICATION PASS...</span>
                     </div>
                   )}
                 </div>
                 
-                <div className="mt-4 bg-slate-950/50 p-4 rounded-xl border border-slate-800/60 space-y-2">
-                  <span className="text-[10px] font-mono uppercase text-amber-400 block font-bold">⚠️ CRITICAL INGESTION STEPS</span>
-                  <p className="text-[11px] text-slate-400 leading-relaxed font-light">
+                <div className="mt-4 bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2">
+                  <span className="text-[10px] font-mono uppercase text-amber-600 block font-bold">⚠️ CRITICAL INGESTION STEPS</span>
+                  <p className="text-[11px] text-slate-600 leading-relaxed font-normal">
                     Ensure image background elements exhibit minimal artifact noise. The target framework must sit completely within focal parameters. Foreign metallic matrices will trigger physical trip wires and emergency shutdown procedures.
                   </p>
                 </div>
@@ -392,57 +437,57 @@ export default function App() {
 
               <div className="mt-6 space-y-3">
                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" id="file-upload-gate" />
-                <label htmlFor="file-upload-gate" className="block w-full text-center bg-slate-950 hover:bg-slate-900 border border-slate-800 py-3 rounded-xl font-bold text-sm cursor-pointer transition text-slate-300">
+                <label htmlFor="file-upload-gate" className="block w-full text-center bg-slate-100 hover:bg-slate-200 border border-slate-200 py-3 rounded-xl font-bold text-sm text-slate-700 cursor-pointer transition">
                   {selectedFile ? 'Swap Ingestion Sample' : 'Select From Media Library'}
                 </label>
                 <button
                   onClick={triggerImageClassification}
                   disabled={!selectedFile || analyzing}
-                  className={`w-full py-3 rounded-xl font-black tracking-wide text-sm transition shadow-lg ${selectedFile && !analyzing ? 'bg-teal-600 hover:bg-teal-500 text-white shadow-teal-900/20' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
+                  className={`w-full py-3 rounded-xl font-black tracking-wide text-sm transition shadow-sm ${selectedFile && !analyzing ? 'bg-teal-600 hover:bg-teal-700 text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
                 >
                   Analyze Compound Structure
                 </button>
               </div>
             </section>
 
-            <section className="bg-[#0c1222] border border-slate-800 rounded-3xl p-6 flex flex-col justify-center min-h-[400px] shadow-xl">
-              <h3 className="text-xs font-mono uppercase tracking-widest text-emerald-400 mb-4">AUTOMATED PROCESS CONFIGURATOR</h3>
+            <section className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col justify-center min-h-[400px] shadow-sm">
+              <h3 className="text-xs font-mono uppercase tracking-widest text-emerald-600 font-bold mb-4">AUTOMATED PROCESS CONFIGURATOR</h3>
               
-              {classifierError && <div className="bg-red-950/40 border border-red-800/60 p-4 rounded-xl text-xs font-mono text-red-400">{classifierError}</div>}
+              {classifierError && <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-xs font-mono text-red-600">{classifierError}</div>}
               {!inferenceResult && !classifierError && !analyzing && (
-                <div className="text-center font-mono text-xs text-slate-500 py-20 border border-slate-950 bg-slate-950/30 rounded-xl">
+                <div className="text-center font-mono text-xs text-slate-400 py-20 border border-slate-100 bg-slate-50 rounded-xl">
                   Awaiting ingestion matrix data streaming...
                 </div>
               )}
 
               {inferenceResult && (
                 <div className="space-y-6">
-                  <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl">
-                    <span className="text-[10px] font-mono uppercase text-slate-400 block">Identified Structural Composition</span>
-                    <div className={`text-3xl font-black tracking-tight mt-1 ${inferenceResult.is_plastic ? 'text-emerald-400' : 'text-red-400'}`}>
+                  <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                    <span className="text-[10px] font-mono uppercase text-slate-500 block">Identified Structural Composition</span>
+                    <div className={`text-3xl font-black tracking-tight mt-1 ${inferenceResult.is_plastic ? 'text-emerald-600' : 'text-red-600'}`}>
                       {inferenceResult.detected_material}
                     </div>
-                    <div className="mt-2 text-xs font-mono text-slate-300">
-                      🎯 Statistical Engine Confidence: <span className="text-teal-400 font-bold">{inferenceResult.confidence}%</span>
+                    <div className="mt-2 text-xs font-mono text-slate-600">
+                      🎯 Statistical Engine Confidence: <span className="text-teal-600 font-bold">{inferenceResult.confidence}%</span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-slate-950 border border-slate-800 p-4 text-center rounded-xl">
-                      <span className="text-[10px] font-mono text-slate-400 block uppercase">Heating Setpoint</span>
-                      <span className={`text-3xl font-black font-mono block mt-1 ${inferenceResult.is_plastic ? 'text-amber-500' : 'text-slate-600'}`}>
+                    <div className="bg-slate-50 border border-slate-200 p-4 text-center rounded-xl">
+                      <span className="text-[10px] font-mono text-slate-500 block uppercase">Heating Setpoint</span>
+                      <span className={`text-3xl font-black font-mono block mt-1 ${inferenceResult.is_plastic ? 'text-amber-600' : 'text-slate-300'}`}>
                         {inferenceResult.recommendedTemp}°C
                       </span>
                     </div>
-                    <div className="bg-slate-950 border border-slate-800 p-4 text-center rounded-xl">
-                      <span className="text-[10px] font-mono text-slate-400 block uppercase">Cooling Duty Cycle</span>
-                      <span className={`text-3xl font-black font-mono block mt-1 ${inferenceResult.is_plastic ? 'text-cyan-400' : 'text-slate-600'}`}>
+                    <div className="bg-slate-50 border border-slate-200 p-4 text-center rounded-xl">
+                      <span className="text-[10px] font-mono text-slate-500 block uppercase">Cooling Duty Cycle</span>
+                      <span className={`text-3xl font-black font-mono block mt-1 ${inferenceResult.is_plastic ? 'text-cyan-600' : 'text-slate-300'}`}>
                         {inferenceResult.recommendedCooling}s
                       </span>
                     </div>
                   </div>
 
-                  <div className={`p-4 rounded-xl border font-mono text-xs leading-relaxed ${inferenceResult.is_plastic ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400' : 'bg-red-950/30 border-red-800/50 text-red-400'}`}>
+                  <div className={`p-4 rounded-xl border font-mono text-xs leading-relaxed ${inferenceResult.is_plastic ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
                     {inferenceResult.action_status}
                   </div>
                 </div>
@@ -455,59 +500,59 @@ export default function App() {
         {activeTab === 'marketplace' && (
           <div className="space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-2">
-              <h3 className="text-xs font-mono uppercase tracking-widest text-teal-400">ECOSPARK HARDWARE DISTRIBUTION</h3>
-              <h4 className="text-3xl font-black text-white">Commercial Hardware & Product Catalog</h4>
-              <p className="text-xs text-slate-400">Acquire enterprise grade automated recycling units or source structural hardware components generated directly by our systems.</p>
+              <h3 className="text-xs font-mono uppercase tracking-widest text-teal-600 font-bold">ECOSPARK HARDWARE DISTRIBUTION</h3>
+              <h4 className="text-3xl font-black text-slate-900">Commercial Hardware & Product Catalog</h4>
+              <p className="text-xs text-slate-500">Acquire enterprise grade automated recycling units or source structural hardware components generated directly by our systems.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* COMPONENT 1: INDEPENDENT MACHINERY RIG */}
-              <div className="bg-[#0c1222] border border-slate-800 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between">
-                <div className="h-64 bg-slate-900 relative">
-                  <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80" alt="EcoSpark Extruder Unit" className="w-full h-full object-cover opacity-80" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c1222] to-transparent"></div>
-                  <span className="absolute bottom-4 left-4 bg-teal-600 px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider">Industrial Equipment</span>
+              <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between">
+                <div className="h-64 bg-slate-100 relative">
+                  <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80" alt="EcoSpark Extruder Unit" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+                  <span className="absolute bottom-4 left-4 bg-teal-600 text-white px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">Industrial Equipment</span>
                 </div>
                 <div className="p-6 space-y-4">
                   <div className="flex justify-between items-start">
-                    <h5 className="text-xl font-bold text-white">EcoSpark Automated Processing Cell v2.5</h5>
-                    <span className="text-lg font-mono font-black text-teal-400">Inquire for Pricing</span>
+                    <h5 className="text-xl font-bold text-slate-900">EcoSpark Automated Processing Cell v2.5</h5>
+                    <span className="text-lg font-mono font-black text-teal-600">Inquire Unit</span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed font-light">
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
                     A fully self-contained manufacturing cell featuring integrated multi-stage optical categorization, adaptive heating controllers, heavy duty high torque extrusion barrels, and interlocked compression molding presses.
                   </p>
-                  <ul className="text-xs font-mono text-slate-300 space-y-1.5 border-t border-slate-800 pt-3">
+                  <ul className="text-xs font-mono text-slate-600 space-y-1.5 border-t border-slate-100 pt-3">
                     <li>📍 Core Architecture: Dual-Core Processing Units</li>
                     <li>📍 Heat Limit Capability: 350°C Max Continuous</li>
                     <li>📍 Assembly Node Point: AASTU Block 57 Grid</li>
                   </ul>
-                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-3 bg-teal-600 hover:bg-teal-500 text-xs font-bold uppercase tracking-wider rounded-xl transition">
+                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-sm">
                     Request Integration Specifications
                   </button>
                 </div>
               </div>
 
               {/* COMPONENT 2: INTERLOCKING BLOCKS */}
-              <div className="bg-[#0c1222] border border-slate-800 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between">
-                <div className="h-64 bg-slate-900 relative">
-                  <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Recycled Materials Components" className="w-full h-full object-cover opacity-70" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c1222] to-transparent"></div>
-                  <span className="absolute bottom-4 left-4 bg-emerald-600 px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider">Output Product</span>
+              <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between">
+                <div className="h-64 bg-slate-100 relative">
+                  <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Recycled Materials Components" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+                  <span className="absolute bottom-4 left-4 bg-emerald-600 text-white px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">Output Product</span>
                 </div>
                 <div className="p-6 space-y-4">
                   <div className="flex justify-between items-start">
-                    <h5 className="text-xl font-bold text-white">High-Density Structural Modules</h5>
-                    <span className="text-lg font-mono font-black text-emerald-400">ETB 450.00 / Unit</span>
+                    <h5 className="text-xl font-bold text-slate-900">High-Density Structural Modules</h5>
+                    <span className="text-lg font-mono font-black text-emerald-600">ETB 450.00 / Unit</span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed font-light">
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
                     Heavy duty structural interlocking modules fabricated entirely from verified circular matrices. Excellent tensile performance profiles designed specifically for urban construction grid installations and retaining walls.
                   </p>
-                  <ul className="text-xs font-mono text-slate-300 space-y-1.5 border-t border-slate-800 pt-3">
+                  <ul className="text-xs font-mono text-slate-600 space-y-1.5 border-t border-slate-100 pt-3">
                     <li>📍 Density Rating: High Viscosity Load Compression</li>
                     <li>📍 Dimensions: 400mm x 200mm Interlocking Grid</li>
                     <li>📍 Composition: 100% Recycled Technical Polymer</li>
                   </ul>
-                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold uppercase tracking-wider rounded-xl transition text-slate-200">
+                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-3 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-sm">
                     Submit Batch Order Application
                   </button>
                 </div>
@@ -520,97 +565,109 @@ export default function App() {
         {activeTab === 'dashboard' && (
           <div className="max-w-6xl mx-auto">
             {!isAdminLoggedIn ? (
-              <div className="max-w-md mx-auto bg-[#0c1222] border border-slate-800 p-8 rounded-3xl shadow-xl text-center">
+              <div className="max-w-md mx-auto bg-white border border-slate-200 p-8 rounded-3xl shadow-md text-center">
                 <span className="text-4xl block mb-2">🔒</span>
-                <h4 className="text-xl font-bold text-white mb-1">Secure Core Administration Portal</h4>
-                <p className="text-xs text-slate-400 mb-6">Restricted utility. Provide specific technical authorization to check active logs.</p>
+                <h4 className="text-xl font-bold text-slate-900 mb-1">Secure Core Administration Portal</h4>
+                <p className="text-xs text-slate-500 mb-6">Restricted utility. Provide specific technical authorization to check active logs.</p>
                 <form onSubmit={handleAdminLogin} className="space-y-4 text-left">
                   <div>
-                    <label className="text-[10px] font-mono text-slate-400 uppercase block mb-1">Root Operator ID</label>
+                    <label className="text-[10px] font-mono text-slate-500 uppercase block mb-1">Root Operator ID</label>
                     <input
                       type="text"
                       placeholder="e.g. admin"
                       value={username}
                       onChange={e => setUsername(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 text-slate-200"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 text-slate-800 transition"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-mono text-slate-400 uppercase block mb-1">Cryptographic Security Token</label>
+                    <label className="text-[10px] font-mono text-slate-500 uppercase block mb-1">Cryptographic Security Token</label>
                     <input
                       type="password"
                       placeholder="••••••••"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 text-slate-200"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 text-slate-800 transition"
                     />
-                    <span className="text-[10px] text-slate-500 font-mono mt-1 block">Hint for review: admin / aastu11</span>
+                    <span className="text-[10px] text-slate-400 font-mono mt-1 block">Hint for review: admin / aastu11</span>
                   </div>
-                  <button type="submit" className="w-full py-3 bg-teal-600 hover:bg-teal-500 text-sm font-bold rounded-xl transition mt-2">
+                  <button type="submit" className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold rounded-xl transition mt-2 shadow-sm">
                     Verify Administrative Access
                   </button>
                 </form>
               </div>
             ) : (
               <div className="space-y-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/40 border border-slate-800 p-6 rounded-2xl">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
                   <div>
-                    <h4 className="text-2xl font-black text-white tracking-tight">EcoSpark Master Control Matrix</h4>
-                    <p className="text-xs text-slate-400 font-mono">Live Ingestion Feeds & Active Customer Communications Monitoring Console</p>
+                    <h4 className="text-2xl font-black text-slate-900 tracking-tight">EcoSpark Master Control Matrix</h4>
+                    <p className="text-xs text-slate-500 font-mono">Live Ingestion Feeds & Active Customer Communications Monitoring Console</p>
                   </div>
-                  <button onClick={() => { setIsAdminLoggedIn(false); setPassword(''); }} className="px-4 py-2 bg-red-950/40 border border-red-900 text-red-400 rounded-lg text-xs font-bold transition">
+                  <button onClick={() => { setIsAdminLoggedIn(false); setPassword(''); }} className="px-4 py-2 bg-red-50 border border-red-200 text-red-600 rounded-lg text-xs font-bold transition hover:bg-red-100">
                     Terminate Session Authorization
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* CENTRAL STREAM LOGGER */}
-                  <div className="lg:col-span-2 bg-[#0c1222] border border-slate-800 rounded-3xl p-6 shadow-md space-y-4">
-                    <h5 className="text-sm font-mono text-teal-400 uppercase tracking-widest">REAL-TIME CLASSIFICATION STREAM LOGS</h5>
+                  <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+                    <h5 className="text-sm font-mono text-teal-600 uppercase tracking-widest font-bold">REAL-TIME CLASSIFICATION STREAM LOGS</h5>
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-xs font-mono">
                         <thead>
-                          <tr className="border-b border-slate-800 text-slate-400">
+                          <tr className="border-b border-slate-200 text-slate-500">
                             <th className="pb-3">Timestamp</th>
                             <th className="pb-3">Target Profile</th>
-                            <th className="pb-3">Confidence Rating</th>
+                            <th className="pb-3">Confidence</th>
                             <th className="pb-3 text-right">Interlock Matrix</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-900 text-slate-300">
-                          {classificationLogs.map((log, index) => (
-                            <tr key={index}>
-                              <td className="py-3.5">{log.timestamp}</td>
-                              <td className="py-3.5 font-bold text-white">{log.material}</td>
-                              <td className="py-3.5">{log.confidence}</td>
-                              <td className="py-3.5 text-right">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'Approved' || log.status === 'Live Input Link' ? 'bg-emerald-950 text-emerald-400 border border-emerald-900' : 'bg-red-950 text-red-400 border border-red-900'}`}>
-                                  {log.status}
-                                </span>
-                              </td>
+                        <tbody className="divide-y divide-slate-100 text-slate-700">
+                          {classificationLogs.length === 0 ? (
+                            <tr>
+                              <td colSpan="4" className="py-8 text-center text-slate-400 italic">No items scanned this session. Upload an image inside the "Classifier" tab to track operations live.</td>
                             </tr>
-                          ))}
+                          ) : (
+                            classificationLogs.map((log, index) => (
+                              <tr key={index}>
+                                <td className="py-3.5">{log.timestamp}</td>
+                                <td className="py-3.5 font-bold text-slate-900">{log.material}</td>
+                                <td className="py-3.5">{log.confidence}</td>
+                                <td className="py-3.5 text-right">
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${log.status.includes('Approved') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                                    {log.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))
+                          )}
                         </tbody>
                       </table>
                     </div>
                   </div>
 
                   {/* ACTIVE CUSTOMER COMMUNICATIONS LOG */}
-                  <div className="bg-[#0c1222] border border-slate-800 rounded-3xl p-6 shadow-md space-y-4">
-                    <h5 className="text-sm font-mono text-emerald-400 uppercase tracking-widest">CUSTOMER INTERFACE PIPELINE</h5>
+                  <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+                    <h5 className="text-sm font-mono text-emerald-600 uppercase tracking-widest font-bold">CUSTOMER INTERFACE PIPELINE</h5>
                     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                      {customerInquiries.map((inq, index) => (
-                        <div key={index} className="bg-slate-950 border border-slate-900 p-4 rounded-xl space-y-2">
-                          <div className="flex justify-between items-start">
-                            <div className="font-bold text-slate-200 text-sm">{inq.name}</div>
-                            <span className="text-[9px] font-mono bg-slate-900 text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded">Inquiry Node</span>
-                          </div>
-                          <div className="text-[10px] text-teal-400 font-mono break-all">{inq.email}</div>
-                          <p className="text-xs text-slate-400 leading-relaxed font-light italic bg-slate-900/40 p-2.5 rounded-lg border border-slate-800/30">
-                            "{inq.msg}"
-                          </p>
+                      {customerInquiries.length === 0 ? (
+                        <div className="text-center font-mono text-xs text-slate-400 py-20 italic">
+                          No user traffic detected. Ask custom questions in the "Chatbot" tab or submit the Contact form to populate telemetry.
                         </div>
-                      ))}
+                      ) : (
+                        customerInquiries.map((inq, index) => (
+                          <div key={index} className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2 shadow-sm">
+                            <div className="flex justify-between items-start">
+                              <div className="font-bold text-slate-800 text-sm">{inq.name}</div>
+                              <span className="text-[9px] font-mono bg-white text-slate-500 border border-slate-200 px-1.5 py-0.5 rounded">Live Traffic</span>
+                            </div>
+                            <div className="text-[10px] text-teal-600 font-mono break-all">{inq.email}</div>
+                            <p className="text-xs text-slate-600 leading-relaxed font-normal italic bg-white p-2.5 rounded-lg border border-slate-100">
+                              "{inq.msg}"
+                            </p>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -621,10 +678,10 @@ export default function App() {
       </main>
 
       {/* FOOTER LAYER */}
-      <footer className="bg-[#0c1222] border-t border-slate-800 px-6 py-6 text-center text-xs font-mono text-slate-500">
+      <footer className="bg-white border-t border-slate-200 px-6 py-6 text-center text-xs font-mono text-slate-500 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <div>© {new Date().getFullYear()} EcoSpark Manufacturing Systems Inc. All Rights Reserved.</div>
-          <div className="text-[11px] text-slate-400 tracking-wider">Addis Ababa Science & Technology University (AASTU) // Integrated Engineering Team Project</div>
+          <div className="text-[11px] text-slate-600 tracking-wider font-semibold">Addis Ababa Science & Technology University (AASTU) // Integrated Engineering Team Project</div>
         </div>
       </footer>
 
