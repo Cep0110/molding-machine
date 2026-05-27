@@ -1,4 +1,4 @@
- import React, { useState } from 'react';
+import React, { useState } from 'react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -19,7 +19,7 @@ export default function App() {
   ]);
   const [userInput, setUserInput] = useState('');
 
-  // --- Dynamic Tracking States (Replaces Static Logs) ---
+  // Dynamic Dashboard Metrics State
   const [classificationLogs, setClassificationLogs] = useState([]);
   const [customerInquiries, setCustomerInquiries] = useState([]);
 
@@ -30,7 +30,7 @@ export default function App() {
   // Directly points to your live Hugging Face Space subdomain endpoint
   const BACKEND_URL = 'https://yani-321212-me-backend.hf.space';
 
-  // --- Expanded RAG Knowledge Base System ---
+  // --- Massively Expanded RAG Knowledge Base ---
   const RAG_KNOWLEDGE_BASE = {
     "how does the system contribute to the environment?": "EcoSpark transforms post-consumer waste materials into structural products, localizing production pipelines and satisfying global circular manufacturing protocols by keeping high-density plastics inside local production loops.",
     "what are the purchase and shipping options?": "The EcoSpark industrial rig is distributed as a turnkey manufacturing cell. Custom modifications, pricing tiers, and procurement options can be initiated directly by submitting an inquiry to our technical team via the contact command module.",
@@ -41,18 +41,26 @@ export default function App() {
     "what structural artifacts can it produce?": "It produces high-density structural interlocking building modules, retaining wall blocks, paving tiles, and customizable composite matrix panels designed for load-bearing urban infrastructure grids.",
     "what is the group composition?": "This project is designed and deployed by the Integrated Engineering Team Project (IETP) Group 11 engineering cluster.",
     "how does the computer vision model classify items?": "The engine captures raw matrix visual inputs at the ingestion intake gate, pipes the binary data over an encrypted API channel to a fine-tuned deep learning image classification space, and checks the composition map against known material profiles.",
-    "what happens to foreign or unapproved materials?": "If a non-plastic matrix, hazardous compound, or unapproved material is detected by the vision model, the system immediately flags a security tripwire exception, rejects the sample, and locks down the feed screw via an electronic safety interlock."
+    "what happens to foreign or unapproved materials?": "If a non-plastic matrix, hazardous compound, or unapproved material is detected by the vision model, the system immediately flags a security tripwire exception, rejects the sample, and locks down the feed screw via an electronic safety interlock.",
+    "what is the required input format for the api?": "The unified connection follows Option A, which reads raw user files into local memory arrays as base64 string data blocks and streams them over JSON to the Hugging Face /api/predict/ route.",
+    "who are the primary developers of this system?": "The platform and mechanical architecture were developed collectively by team engineers Emnemelec, Elshaddai, Elias, Emran, Endalk, and Emran Mohammed.",
+    "what specific polymer classes are supported by the model?": "The system explicitly evaluates high-density polyethylene (HDPE), polypropylene (PP), and other generic polymer residues to trigger explicit safe-melt interlock overrides.",
+    "what happens if the target model confidence falls below forty five percent?": "The classifier activates a hard rejection loop, marking the incoming batch profile as an Unknown Non-Plastic Matrix to preserve the mechanical structural integrity of the barrel assembly.",
+    "where did the team attend the initial project orientation?": "The core orientation session was carried out at AASTU Block 57 at 9:00 local time on March 1, 2026.",
+    "what was the purpose of the march eighth coordination session?": "The team orchestrated a design alignment matrix evaluating localized urban engineering challenges alongside baseline UN Sustainable Development Goal parameters.",
+    "what are the specific thermal limits of the barrel?": "The induction band system supports accurate thermal tracking up to a continuous ceiling of 350°C, managed directly via automated logic.",
+    "how do you calculate funnel true lengths for the hopper assembly?": "Funnel sheet metal fabrication true lengths are resolved using radial line development methods mapping slant heights ($L = \sqrt{R^2 + H^2}$) across standard coordinate projections.",
+    "what is the total lifecycle duration of the project schedule?": "The deployment is calculated across a critical path method (CPM) schedule tracking key technical delivery pathways.",
+    "how are software requirements prioritized for the platform?": "System requirements are verified against the MoSCoW methodology to isolate critical hardware tripwires from standard UI telemetry reporting options.",
+    "what is the root administrator authorization password?": "The secure operator console relies on username 'admin' matched with cryptographic password token 'aastu11'."
   };
 
   const handleFAQClick = (question) => {
     const answer = RAG_KNOWLEDGE_BASE[question.toLowerCase()];
-    
-    // Log user query to the admin dashboard panel dynamically
     setCustomerInquiries(prev => [
-      { name: 'Anonymous User', email: 'Internal RAG Route', msg: `Clicked Quick FAQ: "${question}"` },
+      { name: 'Anonymous User', email: 'Internal RAG Route', msg: `Clicked Preset Query: "${question}"` },
       ...prev
     ]);
-
     setChatMessages(prev => [
       ...prev,
       { sender: 'user', text: question },
@@ -68,7 +76,6 @@ export default function App() {
     const userQuery = originalInput.toLowerCase();
     let botResponse = "I cannot locate specific operational logs regarding that parameter in my external knowledge base directory. Please contact an EcoSpark system architect for deep architectural data.";
 
-    // Track ACTUAL user questions inside the dashboard live state
     setCustomerInquiries(prev => [
       { name: 'Web Assistant User', email: 'Interactive Search Query', msg: originalInput },
       ...prev
@@ -85,17 +92,7 @@ export default function App() {
     setUserInput('');
   };
 
-  // --- Hugging Face Native File Post Binary Handler ---
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      setImagePreview(URL.createObjectURL(file));
-      setInferenceResult(null);
-      setClassifierError('');
-    }
-  };
-
+  // --- GRADIO NATIVE BASE64 STREAM PIPELINE (OPTION A) ---
   const triggerImageClassification = async () => {
     if (!selectedFile) {
       setClassifierError('Please place a valid target image compound inside the intake gate.');
@@ -107,60 +104,72 @@ export default function App() {
     setInferenceResult(null);
 
     try {
-      const formData = new FormData();
-      formData.append('data', selectedFile);
+      const reader = new FileReader();
+      reader.readAsDataURL(selectedFile);
+      reader.onloadend = async () => {
+        const base64Data = reader.result;
 
-      const response = await fetch(`${BACKEND_URL}/api/predict`, {
-        method: 'POST',
-        body: formData,
-      });
+        try {
+          // Pointing directly to Gradio native payload receiver route
+          const response = await fetch(`${BACKEND_URL}/api/predict/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              data: [base64Data] 
+            }),
+          });
 
-      if (!response.ok) throw new Error(`Network infrastructure fault: ${response.status}`);
+          if (!response.ok) throw new Error(`Network infrastructure fault: ${response.status}`);
 
-      const json = await response.json();
-      const rawData = json.data[0];
-      const payload = Array.isArray(rawData) ? rawData[0] : rawData;
+          const json = await response.json();
+          const rawData = json.data;
+          const payload = Array.isArray(rawData) ? rawData[0] : rawData;
 
-      if (payload.error) {
-        setClassifierError(payload.error);
-        // Log error dynamically to dashboard
-        setClassificationLogs(prev => [
-          { 
-            timestamp: new Date().toLocaleTimeString(), 
-            material: 'Processing Error', 
-            confidence: '0.0%', 
-            status: 'Fault Triggered' 
-          },
-          ...prev
-        ]);
-      } else {
-        setInferenceResult(payload);
-        
-        // DYNAMICALLY track classification details into state
-        setClassificationLogs(prev => [
-          { 
-            timestamp: new Date().toLocaleTimeString(), 
-            material: payload.detected_material || 'Unknown Polymer', 
-            confidence: `${payload.confidence || '90.0'}%`, 
-            status: payload.is_plastic ? 'Approved Input' : 'Rejected Material' 
-          },
-          ...prev
-        ]);
-      }
+          if (!payload || payload.error) {
+            setClassifierError(payload?.error || 'Unrecognized response matrix array format layout.');
+            setClassificationLogs(prev => [
+              { timestamp: new Date().toLocaleTimeString(), material: 'Processing Error', confidence: '0.0%', status: 'Fault Triggered' },
+              ...prev
+            ]);
+          } else {
+            setInferenceResult(payload);
+            setClassificationLogs(prev => [
+              { 
+                timestamp: new Date().toLocaleTimeString(), 
+                material: payload.detected_material || 'Unknown Polymer', 
+                confidence: `${payload.confidence || '90.0'}%`, 
+                status: payload.is_plastic ? 'Approved Input' : 'Rejected Material' 
+              },
+              ...prev
+            ]);
+          }
+        } catch (innerErr) {
+          setClassifierError('Failed to establish unified connection to the Hugging Face hardware space cluster.');
+          setClassificationLogs(prev => [
+            { timestamp: new Date().toLocaleTimeString(), material: 'API Offline Timeout', confidence: 'N/A', status: 'Connection Broken' },
+            ...prev
+          ]);
+          console.error(innerErr);
+        } finally {
+          setAnalyzing(false);
+        }
+      };
     } catch (err) {
-      setClassifierError('Failed to establish unified connection to the Hugging Face hardware space cluster.');
-      setClassificationLogs(prev => [
-        { 
-          timestamp: new Date().toLocaleTimeString(), 
-          material: 'API Offline Timeout', 
-          confidence: 'N/A', 
-          status: 'Connection Broken' 
-        },
-        ...prev
-      ]);
-      console.error(err);
-    } finally {
+      setClassifierError('Failed parsing the target asset binary structure local sequence data.');
       setAnalyzing(false);
+      console.error(err);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setInferenceResult(null);
+      setClassifierError('');
     }
   };
 
@@ -168,7 +177,6 @@ export default function App() {
     e.preventDefault();
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
     
-    // Dynamic submission tracking straight to dashboard array
     setCustomerInquiries(prev => [
       { name: contactForm.name, email: contactForm.email, msg: contactForm.message },
       ...prev
@@ -287,15 +295,6 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 p-8 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-6">
-                <div>
-                  <h5 className="text-lg font-bold text-slate-900">System Verification Check Status: Clear</h5>
-                  <p className="text-xs text-slate-600 mt-1">Ready to inspect automated output metrics? Advance straight to the active machine cluster catalog display window.</p>
-                </div>
-                <button onClick={() => setActiveTab('marketplace')} className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition whitespace-nowrap shadow-sm">
-                  Navigate to Machine Showcase
-                </button>
-              </div>
             </section>
 
             {/* CONTACT FRAMEWORK */}
@@ -360,18 +359,15 @@ export default function App() {
               ))}
             </div>
 
-            {/* PRESET SUGGESTIONS FOR CONSUMERS */}
+            {/* QUICK PRESET CLICKS */}
             <div className="p-4 bg-slate-50 border-t border-slate-200">
-              <span className="text-[10px] uppercase tracking-wider font-mono text-slate-500 block mb-2 font-bold">Select Frequent Ingestion Query Parameters:</span>
+              <span className="text-[10px] uppercase tracking-wider font-mono text-slate-500 block mb-2 font-bold">Frequently Queried Parameters:</span>
               <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
                 {[
-                  "How does the system contribute to the environment?",
-                  "What are the purchase and shipping options?",
-                  "Can this machine operate continuously?",
                   "Where is this project engineered?",
-                  "What are the core components of the mechanical assembly?",
                   "How is thermal control maintained?",
-                  "What structural artifacts can it produce?"
+                  "What specific polymer classes are supported by the model?",
+                  "How do you calculate funnel true lengths for the hopper assembly?"
                 ].map((q, i) => (
                   <button
                     key={i}
@@ -425,13 +421,6 @@ export default function App() {
                       <span className="text-xs font-mono tracking-widest text-teal-600 font-bold animate-pulse">EXECUTING CLASSIFICATION PASS...</span>
                     </div>
                   )}
-                </div>
-                
-                <div className="mt-4 bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2">
-                  <span className="text-[10px] font-mono uppercase text-amber-600 block font-bold">⚠️ CRITICAL INGESTION STEPS</span>
-                  <p className="text-[11px] text-slate-600 leading-relaxed font-normal">
-                    Ensure image background elements exhibit minimal artifact noise. The target framework must sit completely within focal parameters. Foreign metallic matrices will trigger physical trip wires and emergency shutdown procedures.
-                  </p>
                 </div>
               </div>
 
@@ -496,7 +485,7 @@ export default function App() {
           </div>
         )}
 
-        {/* MARKETPLACE SECTION */}
+        {/* CATALOG SPECIFICATIONS SECTION */}
         {activeTab === 'marketplace' && (
           <div className="space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-2">
@@ -506,10 +495,10 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* COMPONENT 1: INDEPENDENT MACHINERY RIG */}
+              {/* COMPONENT 1: INDUSTRIAL RIG */}
               <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between">
                 <div className="h-64 bg-slate-100 relative">
-                  <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80" alt="EcoSpark Extruder Unit" className="w-full h-full object-cover" />
+                  <img src="machine.png" alt="EcoSpark Extruder Unit" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
                   <span className="absolute bottom-4 left-4 bg-teal-600 text-white px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">Industrial Equipment</span>
                 </div>
@@ -535,7 +524,7 @@ export default function App() {
               {/* COMPONENT 2: INTERLOCKING BLOCKS */}
               <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between">
                 <div className="h-64 bg-slate-100 relative">
-                  <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Recycled Materials Components" className="w-full h-full object-cover" />
+                  <img src="product.png" alt="Recycled Materials Components" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
                   <span className="absolute bottom-4 left-4 bg-emerald-600 text-white px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">Output Product</span>
                 </div>
@@ -561,7 +550,7 @@ export default function App() {
           </div>
         )}
 
-        {/* PROTECTED CONTROL CENTER */}
+        {/* PROTECTED OPERATOR HUB */}
         {activeTab === 'dashboard' && (
           <div className="max-w-6xl mx-auto">
             {!isAdminLoggedIn ? (
@@ -589,7 +578,7 @@ export default function App() {
                       onChange={e => setPassword(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-teal-500 text-slate-800 transition"
                     />
-                    <span className="text-[10px] text-slate-400 font-mono mt-1 block">Hint for review: admin / aastu11</span>
+                    <span className="text-[10px] text-slate-400 font-mono mt-1 block">Credentials Hint: admin / aastu11</span>
                   </div>
                   <button type="submit" className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold rounded-xl transition mt-2 shadow-sm">
                     Verify Administrative Access
@@ -677,7 +666,7 @@ export default function App() {
         )}
       </main>
 
-      {/* FOOTER LAYER */}
+      {/* GLOBAL FOOTER LAYER */}
       <footer className="bg-white border-t border-slate-200 px-6 py-6 text-center text-xs font-mono text-slate-500 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <div>© {new Date().getFullYear()} EcoSpark Manufacturing Systems Inc. All Rights Reserved.</div>
