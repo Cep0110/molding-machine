@@ -26,6 +26,7 @@ export default function App() {
   // Contact Form States
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [contactSuccess, setContactSuccess] = useState(false);
+  const [contactError, setContactError] = useState('');
 
   // Unified Connection to Hugging Face Space subdomain endpoint
   const BACKEND_URL = 'https://yani-321212-me-backend.hf.space';
@@ -92,7 +93,7 @@ export default function App() {
     setUserInput('');
   };
 
-  // --- NATIVE BASE64 STREAM PIPELINE ---
+  // --- NATIVE BASE64 STREAM PIPELINE MATCHING HUGGING FACE / GRADIO EXPECTATIONS ---
   const triggerImageClassification = async () => {
     if (!selectedFile) {
       setClassifierError('Please place a valid target image compound inside the intake gate.');
@@ -110,14 +111,19 @@ export default function App() {
         const fullBase64Data = reader.result;
 
         try {
-          // Strict JSON structural array formatting for direct API/Predict gateways
+          // Strict payload format expected by Gradio 4+ predict endpoints
           const response = await fetch(`${BACKEND_URL}/api/predict/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              data: [fullBase64Data]
+              data: [
+                {
+                  data: fullBase64Data,
+                  name: selectedFile.name
+                }
+              ]
             }),
           });
 
@@ -173,10 +179,19 @@ export default function App() {
     }
   };
 
+  // --- SYSTEM VALIDATION AND DASHBOARD ROUTING PIPELINE ---
   const handleContactSubmit = (e) => {
     e.preventDefault();
-    if (!contactForm.name || !contactForm.email || !contactForm.message) return;
+    setContactError('');
+    setContactSuccess(false);
+
+    // Strict validation: check that all fields are filled
+    if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) {
+      setContactError('All transmission telemetry fields must be completely filled before processing.');
+      return;
+    }
     
+    // Automatically appends to dashboard live data array
     setCustomerInquiries(prev => [
       { name: contactForm.name, email: contactForm.email, msg: contactForm.message },
       ...prev
@@ -184,7 +199,6 @@ export default function App() {
     
     setContactSuccess(true);
     setContactForm({ name: '', email: '', message: '' });
-    setTimeout(() => setContactSuccess(false), 4000);
   };
 
   const handleAdminLogin = (e) => {
@@ -248,7 +262,7 @@ export default function App() {
               </div>
             </header>
 
-            {/* UN SDG IMPERATIVE VALUES WITH PROFESSIONAL ICONS */}
+            {/* UN SDG IMPERATIVE VALUES */}
             <section className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="mb-8 border-l-4 border-amber-500 pl-4">
                 <h3 className="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-bold">IMPACT METRIC VERIFICATION</h3>
@@ -298,7 +312,7 @@ export default function App() {
               </div>
             </section>
 
-            {/* PROCESS TIMELINE WITH INLINE ICON REPOSITORIES */}
+            {/* PROCESS TIMELINE */}
             <section className="space-y-8">
               <div className="text-center">
                 <h3 className="text-[10px] font-mono uppercase tracking-widest text-amber-600 font-bold">OPERATIONAL FLOW PIPELINE</h3>
@@ -353,9 +367,14 @@ export default function App() {
                 <button type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-sm">
                   Transmit Telemetry Package
                 </button>
+                {contactError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-center text-xs font-mono">
+                    ⚠️ {contactError}
+                  </div>
+                )}
                 {contactSuccess && (
                   <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-xl text-center text-xs font-mono">
-                    ✅ Data packet transmitted successfully to AASTU Block 57.
+                    ✅ Data packet transmitted successfully. Checked and routed to dashboard tracking system.
                   </div>
                 )}
               </form>
@@ -363,7 +382,7 @@ export default function App() {
           </div>
         )}
 
-        {/* AI ASSISTANT (RAG SYSTEM) - PROFESSIONAL LIGHT STYLING */}
+        {/* AI ASSISTANT (RAG SYSTEM) */}
         {activeTab === 'chatbot' && (
           <div className="max-w-4xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[580px]">
             <div className="bg-slate-50 p-5 border-b border-slate-200 flex justify-between items-center">
@@ -384,7 +403,6 @@ export default function App() {
               ))}
             </div>
 
-            {/* QUICK PRESET CLICKS */}
             <div className="p-4 bg-slate-50 border-t border-slate-200">
               <span className="text-[9px] uppercase tracking-wider font-mono text-slate-400 block mb-2 font-bold">Frequently Queried Parameters:</span>
               <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
@@ -510,7 +528,7 @@ export default function App() {
           </div>
         )}
 
-        {/* CATALOG SPECIFICATIONS SECTION - DESIGN UN-CRUNCHED */}
+        {/* CATALOG SPECIFICATIONS SECTION */}
         {activeTab === 'marketplace' && (
           <div className="space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-2">
@@ -520,10 +538,9 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* COMPONENT 1: INDUSTRIAL RIG (ANTI-CROP POSITION FIX) */}
+              {/* COMPONENT 1: INDUSTRIAL RIG */}
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between">
                 <div className="h-64 bg-slate-50 relative flex items-center justify-center p-4 border-b border-slate-100">
-                  {/* ADJUSTED: Scale down object alignment properties to completely prevent image component clipping */}
                   <img src="/machine.png" alt="EcoSpark Extruder Unit" className="max-h-full max-w-full object-scale-down mix-blend-multiply" />
                   <span className="absolute bottom-4 left-4 bg-amber-500 text-slate-950 px-2.5 py-1 rounded text-[9px] font-mono font-bold uppercase tracking-wider shadow-sm">Industrial Equipment</span>
                 </div>
@@ -546,7 +563,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* COMPONENT 2: INTERLOCKING BLOCKS WITH DYNAMIC PRICE RANGES */}
+              {/* COMPONENT 2: INTERLOCKING BLOCKS */}
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between">
                 <div className="h-64 bg-slate-50 relative flex items-center justify-center p-4 border-b border-slate-100">
                   <img src="/product.jpg" alt="Recycled Materials Components" className="max-h-full max-w-full object-scale-down mix-blend-multiply" />
@@ -555,7 +572,6 @@ export default function App() {
                 <div className="p-6 space-y-4">
                   <div className="flex justify-between items-start">
                     <h5 className="text-lg font-bold text-slate-900">High-Density Structural Modules</h5>
-                    {/* UPDATED: Price adjusted to new specification threshold layout */}
                     <span className="text-sm font-mono font-black text-amber-600">50.00 - 100.00 ETB / Unit</span>
                   </div>
                   <p className="text-xs text-slate-500 leading-relaxed font-normal">
@@ -673,7 +689,7 @@ export default function App() {
                           <div key={index} className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2 shadow-sm">
                             <div className="flex justify-between items-start">
                               <div className="font-bold text-slate-800 text-xs">{inq.name}</div>
-                              <span className="text-[9px] font-mono bg-white border border-slate-200 text-slate-400 px-1.5 py-0.5 rounded">Live Traffic</span>
+                              <span className="text-[9px] font-mono bg-white border border-slate-200 text-slate-400 px-1.5 py-0.5 rounded">Contact Form</span>
                             </div>
                             <div className="text-[9px] text-amber-600 font-mono break-all">{inq.email}</div>
                             <p className="text-xs text-slate-500 leading-relaxed font-normal italic bg-white p-2.5 rounded-lg border border-slate-100">
