@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -93,7 +93,7 @@ export default function App() {
     setUserInput('');
   };
 
-  // --- NATIVE BASE64 STREAM PIPELINE MATCHING HUGGING FACE / GRADIO EXPECTATIONS ---
+  // --- FAILLOVER ROBUST HANDSHAKE PIPELINE FOR GRADIO/HF APIS ---
   const triggerImageClassification = async () => {
     if (!selectedFile) {
       setClassifierError('Please place a valid target image compound inside the intake gate.');
@@ -110,62 +110,71 @@ export default function App() {
       reader.onloadend = async () => {
         const fullBase64Data = reader.result;
 
-        try {
-          // Strict payload format expected by Gradio 4+ predict endpoints
-          const response = await fetch(`${BACKEND_URL}/api/predict/`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              data: [
-                {
-                  data: fullBase64Data,
-                  name: selectedFile.name
-                }
-              ]
-            }),
-          });
+        // Structured payload to cleanly resolve both internal proxy routing paths
+        const routesToTest = [`${BACKEND_URL}/api/predict/`, `${BACKEND_URL}/run/predict`];
+        let responseJson = null;
+        let success = false;
 
-          if (!response.ok) throw new Error(`Network infrastructure fault: ${response.status}`);
+        for (let route of routesToTest) {
+          if (success) break;
+          try {
+            const response = await fetch(route, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                data: [
+                  {
+                    data: fullBase64Data,
+                    name: selectedFile.name
+                  }
+                ]
+              }),
+            });
 
-          const json = await response.json();
-          const rawData = json.data;
-          const payload = Array.isArray(rawData) ? rawData[0] : rawData;
-
-          if (!payload || payload.error) {
-            setClassifierError(payload?.error || 'Unrecognized response matrix array format layout.');
-            setClassificationLogs(prev => [
-              { timestamp: new Date().toLocaleTimeString(), material: 'Processing Error', confidence: '0.0%', status: 'Fault Triggered' },
-              ...prev
-            ]);
-          } else {
-            setInferenceResult(payload);
-            setClassificationLogs(prev => [
-              { 
-                timestamp: new Date().toLocaleTimeString(), 
-                material: payload.detected_material || 'Unknown Polymer', 
-                confidence: `${payload.confidence || '90.0'}%`, 
-                status: payload.is_plastic ? 'Approved Input' : 'Rejected Material' 
-              },
-              ...prev
-            ]);
+            if (response.ok) {
+              responseJson = await response.json();
+              success = true;
+            }
+          } catch (e) {
+            console.warn(`Route ${route} failed handshake, moving to secondary node pipeline fallback.`);
           }
-        } catch (innerErr) {
-          setClassifierError('Failed to establish unified connection to the Hugging Face hardware space cluster.');
+        }
+
+        if (!success || !responseJson) {
+          throw new Error('All infrastructure endpoint variations timed out.');
+        }
+
+        const rawData = responseJson.data;
+        const payload = Array.isArray(rawData) ? rawData[0] : rawData;
+
+        if (!payload || payload.error) {
+          setClassifierError(payload?.error || 'Unrecognized response matrix array format layout.');
           setClassificationLogs(prev => [
-            { timestamp: new Date().toLocaleTimeString(), material: 'API Offline Timeout', confidence: 'N/A', status: 'Connection Broken' },
+            { timestamp: new Date().toLocaleTimeString(), material: 'Processing Error', confidence: '0.0%', status: 'Fault Triggered' },
             ...prev
           ]);
-          console.error(innerErr);
-        } finally {
-          setAnalyzing(false);
+        } else {
+          setInferenceResult(payload);
+          setClassificationLogs(prev => [
+            { 
+              timestamp: new Date().toLocaleTimeString(), 
+              material: payload.detected_material || 'Unknown Polymer', 
+              confidence: `${payload.confidence || '90.0'}%`, 
+              status: payload.is_plastic ? 'Approved Input' : 'Rejected Material' 
+            },
+            ...prev
+          ]);
         }
       };
     } catch (err) {
-      setClassifierError('Failed parsing the target asset binary structure local sequence data.');
+      setClassifierError('Failed to establish unified connection to the Hugging Face hardware space cluster. Verify space runtime architecture updates.');
+      setClassificationLogs(prev => [
+        { timestamp: new Date().toLocaleTimeString(), material: 'API Offline Timeout', confidence: 'N/A', status: 'Connection Broken' },
+        ...prev
+      ]);
       setAnalyzing(false);
-      console.error(err);
+    } finally {
+      // Wrapped logic managed internally via asynchronous callbacks
     }
   };
 
@@ -179,19 +188,19 @@ export default function App() {
     }
   };
 
-  // --- SYSTEM VALIDATION AND DASHBOARD ROUTING PIPELINE ---
+  // --- CONTACT INTERFACE TELEMETRY COMPLIANCE LOOP ---
   const handleContactSubmit = (e) => {
     e.preventDefault();
     setContactError('');
     setContactSuccess(false);
 
-    // Strict validation: check that all fields are filled
+    // Explicitly check that all input fields are provided
     if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) {
       setContactError('All transmission telemetry fields must be completely filled before processing.');
       return;
     }
     
-    // Automatically appends to dashboard live data array
+    // Pushing structural data straight down into admin panel tracking arrays
     setCustomerInquiries(prev => [
       { name: contactForm.name, email: contactForm.email, msg: contactForm.message },
       ...prev
@@ -555,7 +564,7 @@ export default function App() {
                   <ul className="text-xs font-mono text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
                     <li>📍 Core Architecture: Dual-Core Processing Units</li>
                     <li>📍 Heat Limit Capability: 350°C Max Continuous</li>
-                    <li>📍 Assembly Node Point: AASTU Block 57 Grid</li>
+                    <li>📍 Assembly Node Point: AASTU Innovation Center</li>
                   </ul>
                   <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-sm">
                     Request Integration Specifications
