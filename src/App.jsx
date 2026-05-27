@@ -19,7 +19,7 @@ export default function App() {
   ]);
   const [userInput, setUserInput] = useState('');
 
-  // Dynamic Dashboard Metrics State
+  // Dynamic Dashboard Tracking States
   const [classificationLogs, setClassificationLogs] = useState([]);
   const [customerInquiries, setCustomerInquiries] = useState([]);
 
@@ -110,7 +110,6 @@ export default function App() {
         const base64Data = reader.result;
 
         try {
-          // Pointing directly to Gradio native payload receiver route
           const response = await fetch(`${BACKEND_URL}/api/predict/`, {
             method: 'POST',
             headers: {
@@ -498,7 +497,7 @@ export default function App() {
               {/* COMPONENT 1: INDUSTRIAL RIG */}
               <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between">
                 <div className="h-64 bg-slate-100 relative">
-                  <img src="machine.png" alt="EcoSpark Extruder Unit" className="w-full h-full object-cover" />
+                  <img src="/machine.jpg" alt="EcoSpark Extruder Unit" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
                   <span className="absolute bottom-4 left-4 bg-teal-600 text-white px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">Industrial Equipment</span>
                 </div>
@@ -524,7 +523,7 @@ export default function App() {
               {/* COMPONENT 2: INTERLOCKING BLOCKS */}
               <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between">
                 <div className="h-64 bg-slate-100 relative">
-                  <img src="product.png" alt="Recycled Materials Components" className="w-full h-full object-cover" />
+                  <img src="/product.jpg" alt="Recycled Materials Components" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
                   <span className="absolute bottom-4 left-4 bg-emerald-600 text-white px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">Output Product</span>
                 </div>
