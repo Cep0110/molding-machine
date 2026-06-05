@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -12,6 +12,7 @@ export default function App() {
   const [analyzing, setAnalyzing] = useState(false);
   const [inferenceResult, setInferenceResult] = useState(null);
   const [classifierError, setClassifierError] = useState('');
+  const [showPlasticInfo, setShowPlasticInfo] = useState(false); // New state for plastic info
 
   // Chatbot States
   const [chatMessages, setChatMessages] = useState([
@@ -53,7 +54,9 @@ export default function App() {
     "how do you calculate funnel true lengths for the hopper assembly?": "Funnel sheet metal fabrication true lengths are resolved using radial line development methods mapping slant heights ($L = \\sqrt{R^2 + H^2}$) across standard coordinate projections.",
     "what is the total lifecycle duration of the project schedule?": "The deployment is calculated across a critical path method (CPM) schedule tracking key technical delivery pathways.",
     "how are software requirements prioritized for the platform?": "System requirements are verified against the MoSCoW methodology to isolate critical hardware tripwires from standard UI telemetry reporting options.",
-    "what is the root administrator authorization password?": "The secure operator console relies on username 'admin' matched with cryptographic password token 'aastu11'."
+    "what is the root administrator authorization password?": "The secure operator console relies on username 'admin' matched with cryptographic password token 'aastu11'.",
+    "how to use the machine?": "To use the machine: 1. Turn on the machine after plugging in the socket, then check the breaker and switch. 2. Set the temperature in the REC700 to 200-220°C. 3. Wait until the machine is heated. 4. Add the raw material to the feeder. 5. Once heated, ensure the clamping unit is set. 6. Press the motor button; the raw material will be fed to the screw, then to the nozzle, and finally to the mold. 7. Wait 3-5 seconds until the mold is filled. 8. Release the motor button to see your product in the clamping unit. The mold can be changed as needed based on customer order.",
+    "what are the 7 types of plastic?": "The seven types of plastic are commonly known as the 'Resin Identification Codes' or 'Plastic Identification Codes.' They are a classification system developed by the Society of the Plastics Industry (SPI) to help identify and sort different types of plastics for recycling purposes. Each type is assigned a specific number from 1 to 7, and each number represents a different type of plastic. These include: Polyethylene Terephthalate (PET or PETE), High-Density Polyethylene (HDPE), Polyvinyl Chloride (PVC), Low-Density Polyethylene (LDPE), Polypropylene (PP), Polystyrene (PS), and Other (often Polycarbonate, Polylactide, Acrylic, or other). Our machine only accepts HDPE and PP for processing.",
   };
 
   const handleFAQClick = (question) => {
@@ -107,15 +110,24 @@ export default function App() {
     // Dynamic file-name analyzer to simulate high-accuracy classification patterns if HF CORS drops
     const lowerName = selectedFile.name.toLowerCase();
     let localPayloadFallback = {
-      detected_material: "HDPE (High-Density Polyethylene)",
-      confidence: "96.4",
-      is_plastic: true,
-      recommendedTemp: 220,
-      recommendedCooling: 45,
-      action_status: "SYSTEM INTERLOCK VERIFIED: Target profile cleared for structural extrusion loop."
+      detected_material: "Unknown Non-Plastic Matrix",
+      confidence: "0.0",
+      is_plastic: false,
+      recommendedTemp: 0,
+      recommendedCooling: 0,
+      action_status: "CRITICAL SECURITY EXCEPTION: Non-plastic component encountered. Electronic safety gate deployed."
     };
 
-    if (lowerName.includes('pp') || lowerName.includes('polypropylene')) {
+    if (lowerName.includes('hdpe')) {
+      localPayloadFallback = {
+        detected_material: "HDPE (High-Density Polyethylene)",
+        confidence: "96.4",
+        is_plastic: true,
+        recommendedTemp: 220,
+        recommendedCooling: 45,
+        action_status: "SYSTEM INTERLOCK VERIFIED: Target profile cleared for structural extrusion loop."
+      };
+    } else if (lowerName.includes('pp') || lowerName.includes('polypropylene')) {
       localPayloadFallback = {
         detected_material: "PP (Polypropylene Matrix)",
         confidence: "94.1",
@@ -123,6 +135,51 @@ export default function App() {
         recommendedTemp: 240,
         recommendedCooling: 50,
         action_status: "SYSTEM INTERLOCK VERIFIED: Polymer match found. Initializing specific barrel thermal configuration."
+      };
+    } else if (lowerName.includes('pet') || lowerName.includes('pete')) {
+      localPayloadFallback = {
+        detected_material: "PET (Polyethylene Terephthalate)",
+        confidence: "88.0",
+        is_plastic: false, // Explicitly marked as non-accepted by machine
+        recommendedTemp: 0,
+        recommendedCooling: 0,
+        action_status: "WARNING: PET detected. This material is not approved for current system configuration. Electronic safety gate deployed."
+      };
+    } else if (lowerName.includes('pvc')) {
+      localPayloadFallback = {
+        detected_material: "PVC (Polyvinyl Chloride)",
+        confidence: "92.0",
+        is_plastic: false, // Explicitly marked as non-accepted by machine
+        recommendedTemp: 0,
+        recommendedCooling: 0,
+        action_status: "WARNING: PVC detected. This material is not approved for current system configuration. Electronic safety gate deployed."
+      };
+    } else if (lowerName.includes('ldpe')) {
+      localPayloadFallback = {
+        detected_material: "LDPE (Low-Density Polyethylene)",
+        confidence: "85.0",
+        is_plastic: false, // Explicitly marked as non-accepted by machine
+        recommendedTemp: 0,
+        recommendedCooling: 0,
+        action_status: "WARNING: LDPE detected. This material is not approved for current system configuration. Electronic safety gate deployed."
+      };
+    } else if (lowerName.includes('ps') || lowerName.includes('polystyrene')) {
+      localPayloadFallback = {
+        detected_material: "PS (Polystyrene)",
+        confidence: "90.0",
+        is_plastic: false, // Explicitly marked as non-accepted by machine
+        recommendedTemp: 0,
+        recommendedCooling: 0,
+        action_status: "WARNING: PS detected. This material is not approved for current system configuration. Electronic safety gate deployed."
+      };
+    } else if (lowerName.includes('other')) {
+      localPayloadFallback = {
+        detected_material: "Other Plastic Type (Category 7)",
+        confidence: "70.0",
+        is_plastic: false, // Explicitly marked as non-accepted by machine
+        recommendedTemp: 0,
+        recommendedCooling: 0,
+        action_status: "WARNING: 'Other' plastic type detected. This material is not approved for current system configuration. Electronic safety gate deployed."
       };
     } else if (lowerName.includes('metal') || lowerName.includes('iron') || lowerName.includes('glass') || lowerName.includes('stone')) {
       localPayloadFallback = {
@@ -164,9 +221,18 @@ export default function App() {
           const payload = Array.isArray(rawData) ? rawData[0] : rawData;
 
           if (payload && !payload.error) {
-            setInferenceResult(payload);
+            // Check if the detected material is HDPE or PP, otherwise mark as rejected
+            const isApprovedPlastic = payload.detected_material.includes("HDPE") || payload.detected_material.includes("PP");
+            const finalPayload = {
+              ...payload,
+              is_plastic: isApprovedPlastic,
+              action_status: isApprovedPlastic 
+                ? payload.action_status 
+                : `WARNING: ${payload.detected_material} detected. This material is not approved for current system configuration. Electronic safety gate deployed.`
+            };
+            setInferenceResult(finalPayload);
             setClassificationLogs(prev => [
-              { timestamp: new Date().toLocaleTimeString(), material: payload.detected_material, confidence: `${payload.confidence}%`, status: payload.is_plastic ? 'Approved Input' : 'Rejected Material' },
+              { timestamp: new Date().toLocaleTimeString(), material: finalPayload.detected_material, confidence: `${finalPayload.confidence}%`, status: finalPayload.is_plastic ? 'Approved Input' : 'Rejected Material' },
               ...prev
             ]);
             setAnalyzing(false);
@@ -206,6 +272,7 @@ export default function App() {
       setImagePreview(URL.createObjectURL(file));
       setInferenceResult(null);
       setClassifierError('');
+      setShowPlasticInfo(false); // Hide info when new file selected
     }
   };
 
@@ -438,7 +505,8 @@ export default function App() {
                   "Where is this project engineered?",
                   "How is thermal control maintained?",
                   "What specific polymer classes are supported by the model?",
-                  "How do you calculate funnel true lengths for the hopper assembly?"
+                  "How do you calculate funnel true lengths for the hopper assembly?",
+                  "What are the 7 types of plastic?", // Added new FAQ
                 ].map((q, i) => (
                   <button
                     key={i}
@@ -493,6 +561,12 @@ export default function App() {
                     </div>
                   )}
                 </div>
+                
+                {/* Reference image for material processing */}
+                <div className="mt-4 flex flex-col items-center">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 font-bold">Accepted Material Format</span>
+                  <img src="/finegrained.jpg" alt="Processed material reference" className="mt-2 w-32 h-auto object-contain rounded-md border border-slate-200" />
+                </div>
               </div>
 
               <div className="mt-6 space-y-3">
@@ -507,6 +581,31 @@ export default function App() {
                 >
                   Analyze Compound Structure
                 </button>
+                <button
+                  onClick={() => setShowPlasticInfo(!showPlasticInfo)}
+                  className="w-full py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm"
+                >
+                  {showPlasticInfo ? 'Hide Plastic Information' : 'More About Plastics'}
+                </button>
+                {showPlasticInfo && (
+                  <div className="bg-white border border-slate-200 p-4 rounded-xl text-xs leading-relaxed text-slate-700 shadow-inner">
+                    <h5 className="font-bold text-slate-900 mb-2">The 7 Types of Plastic (Resin Identification Codes):</h5>
+                    <img src="/the 7 types.jpg" alt="7 types of plastic" className="mb-3 w-full h-auto object-contain rounded-md border border-slate-100" />
+                    <ul className="list-disc list-inside space-y-1">
+                      <li><span className="font-bold">1 (PET/PETE)</span> - Polyethylene Terephthalate: (e.g., beverage bottles, food containers).</li>
+                      <li><span className="font-bold">2 (HDPE)</span> - High-Density Polyethylene: (e.g., milk jugs, detergent bottles). <span className="text-emerald-600 font-bold">(Accepted by EcoSpark)</span></li>
+                      <li><span className="font-bold">3 (PVC)</span> - Polyvinyl Chloride: (e.g., pipes, window frames).</li>
+                      <li><span className="font-bold">4 (LDPE)</span> - Low-Density Polyethylene: (e.g., plastic bags, shrink wrap).</li>
+                      <li><span className="font-bold">5 (PP)</span> - Polypropylene: (e.g., food containers, bottle caps). <span className="text-emerald-600 font-bold">(Accepted by EcoSpark)</span></li>
+                      <li><span className="font-bold">6 (PS)</span> - Polystyrene: (e.g., foam cups, packaging).</li>
+                      <li><span className="font-bold">7 (OTHER)</span> - Other Plastics: (e.g., polycarbonate, polylactide).</li>
+                    </ul>
+                    <p className="mt-3 text-red-600 font-bold">
+                      Note: The EcoSpark machine is currently configured to accept and process only HDPE (High-Density Polyethylene) and PP (Polypropylene) raw materials. Other plastic types will be rejected.
+                    </p>
+                    <p className="mt-2 text-center text-slate-500 font-mono text-[9px]">🌏 Recycle today for a better tomorrow</p>
+                  </div>
+                )}
               </div>
             </section>
 
@@ -585,6 +684,15 @@ export default function App() {
                     <li>📍 Heat Limit Capability: 350°C Max Continuous</li>
                     <li>📍 Assembly Node Point: AASTU Innovation Center</li>
                   </ul>
+                  <button
+                    onClick={() => { 
+                      setActiveTab('chatbot'); 
+                      handleFAQClick("how to use the machine?");
+                    }} 
+                    className="w-full py-3 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-sm mb-2"
+                  >
+                    How to Use the Machine
+                  </button>
                   <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-sm">
                     Request Integration Specifications
                   </button>
