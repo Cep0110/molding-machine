@@ -1,20 +1,6 @@
  
 
-
-import React, { useState } from 'react';
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState
-
-
-
-Cloud computers
-New
-
-ecospark_updated_v2.txt
+ 
 import React, { useState } from 'react';
 
 export default function App() {
@@ -169,7 +155,7 @@ export default function App() {
             recommendedTemp = 240;
             recommendedCooling = 50;
             detectedMaterial = "PP (Polypropylene Matrix)";
-            actionStatus = "SYSTEM INTERLOCK VERIFIED: Initializing specific barrel thermal configuration.";
+            actionStatus = "SYSTEM INTERLOCK VERIFIED: Polymer match found. Initializing specific barrel thermal configuration.";
           } else if (lowerDetectedMaterial.includes('pet')) {
             detectedMaterial = "PET (Polyethylene Terephthalate)";
             actionStatus = "WARNING: PET detected. This material is not approved for current system configuration. Electronic safety gate deployed.";
@@ -223,7 +209,7 @@ export default function App() {
         if (lowerName.includes('hdpe')) {
           localFallback = { detected_material: "HDPE (High-Density Polyethylene)", confidence: "96.4", is_plastic: true, recommendedTemp: 220, recommendedCooling: 45, action_status: "SYSTEM INTERLOCK VERIFIED: Target profile cleared for structural extrusion loop." };
         } else if (lowerName.includes('pp')) {
-          localFallback = { detected_material: "PP (Polypropylene Matrix)", confidence: "94.2", is_plastic: true, recommendedTemp: 240, recommendedCooling: 50, action_status: "SYSTEM INTERLOCK VERIFIED: Initializing specific barrel thermal configuration." };
+          localFallback = { detected_material: "PP (Polypropylene Matrix)", confidence: "94.1", is_plastic: true, recommendedTemp: 240, recommendedCooling: 50, action_status: "SYSTEM INTERLOCK VERIFIED: Polymer match found. Initializing specific barrel thermal configuration." };
         } else if (lowerName.includes('pet')) {
           localFallback = { detected_material: "PET (Polyethylene Terephthalate)", confidence: "88.0", is_plastic: false, recommendedTemp: 0, recommendedCooling: 0, action_status: "WARNING: PET detected. This material is not approved for current system configuration. Electronic safety gate deployed." };
         } else if (lowerName.includes('pvc')) {
@@ -285,13 +271,10 @@ export default function App() {
     <div className="min-h-screen bg-white flex flex-col">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-100 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col items-center gap-4">
-          <div className="flex flex-col items-center">
-            <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="EcoSpark Logo" className="h-8 w-auto" />
-              <h1 className="text-lg font-black text-slate-900 tracking-tight">ECOSPARK</h1>
-            </div>
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">AASTU IETP</div>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="EcoSpark Logo" className="h-8 w-auto" />
+            <h1 className="text-lg font-black text-slate-900 tracking-tight">ECOSPARK</h1>
           </div>
           <nav className="flex gap-1">
             {[
@@ -318,10 +301,10 @@ export default function App() {
         {activeTab === 'home' && (
           <div className="max-w-7xl mx-auto px-6 py-16 space-y-24">
             {/* HERO */}
-            <section className="max-w-4xl mx-auto text-center space-y-8">
+            <section className="max-w-4xl space-y-6">
               <h2 className="text-5xl font-black text-slate-900 leading-[1.1]">Transforming Secondary Polymers Into Architectural Value</h2>
-              <p className="text-lg text-slate-500 leading-relaxed max-w-3xl mx-auto">Empowering localized circular macro-economies through high-precision computerized micro-extrusion systems designed for distributed community manufacturing applications.</p>
-              <div className="flex items-center justify-center gap-6 pt-4">
+              <p className="text-lg text-slate-500 leading-relaxed">EcoSpark orchestrates the transition toward decentralized circular macro-economies by deploying automated micro-extrusion systems that convert post-consumer waste into high-performance structural artifacts.</p>
+              <div className="flex items-center gap-6">
                 <button onClick={() => setActiveTab('classifier')} className="bg-amber-500 text-white px-8 py-4 rounded-lg font-black text-xs tracking-widest uppercase shadow-lg shadow-amber-200 hover:bg-amber-600 transition">LAUNCH INGESTION SCANNER</button>
                 <button onClick={() => setActiveTab('marketplace')} className="text-slate-900 font-black text-xs tracking-widest uppercase border-b-2 border-amber-500 pb-1">EXPLORE MACHINE SPECIFICATIONS</button>
               </div>
@@ -435,50 +418,90 @@ export default function App() {
             </section>
 
             <section className="bg-slate-50 border border-slate-100 rounded-3xl p-8 flex flex-col justify-center min-h-[500px]">
-              <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-6">Real-time Inference Matrix</h3>
-              {!inferenceResult ? (
-                <div className="text-center space-y-4 py-12">
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm border border-slate-100">
-                    <span className="text-2xl">📡</span>
-                  </div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Waiting for Compound Feed...</p>
-                </div>
-              ) : (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Detected Material Profile</label>
-                    <div className={`text-2xl font-black uppercase tracking-tight ${inferenceResult.is_plastic ? 'text-emerald-600' : 'text-red-600'}`}>{inferenceResult.detected_material}</div>
+              <h3 className="text-[10px] font-black text-amber-500 tracking-widest uppercase mb-6">AUTOMATED PROCESS CONFIGURATOR</h3>
+              {classifierError && <div className="bg-red-50 text-red-600 p-4 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-red-100 mb-6">⚠️ {classifierError}</div>}
+              {!inferenceResult && !analyzing && <div className="text-center text-slate-300 py-24 italic text-xs font-bold uppercase tracking-widest">Awaiting ingestion data...</div>}
+              {inferenceResult && (
+                <div className="space-y-8">
+                  <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Composition Profile</span>
+                    <div className={`text-3xl font-black tracking-tight ${inferenceResult.is_plastic ? 'text-amber-500' : 'text-red-500'}`}>{inferenceResult.detected_material}</div>
+                    <div className="mt-2 text-[10px] font-bold text-slate-500">CONFIDENCE: <span className="text-amber-500">{inferenceResult.confidence}%</span></div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                      <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-1">Confidence</label>
-                      <div className="text-lg font-black text-slate-900">{inferenceResult.confidence}%</div>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-100 text-center">
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Thermal Set</span>
+                      <span className="text-2xl font-black text-slate-900">{inferenceResult.recommendedTemp}°C</span>
                     </div>
-                    <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                      <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-1">Status</label>
-                      <div className={`text-[10px] font-black uppercase ${inferenceResult.is_plastic ? 'text-emerald-600' : 'text-red-600'}`}>{inferenceResult.is_plastic ? 'Approved' : 'Rejected'}</div>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-100 text-center">
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cooling Cycle</span>
+                      <span className="text-2xl font-black text-slate-900">{inferenceResult.recommendedCooling}s</span>
                     </div>
                   </div>
-                  {inferenceResult.is_plastic && (
-                    <div className="space-y-4 pt-4 border-t border-slate-200">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Target Temp</label>
-                          <div className="text-sm font-black text-slate-900">{inferenceResult.recommendedTemp}°C</div>
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Cooling Cycle</label>
-                          <div className="text-sm font-black text-slate-900">{inferenceResult.recommendedCooling}s</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <div className={`p-4 rounded-2xl border text-[10px] font-bold leading-relaxed uppercase tracking-wide ${inferenceResult.is_plastic ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-red-50 border-red-100 text-red-700'}`}>
-                    {inferenceResult.action_status}
-                  </div>
+                  <div className={`p-5 rounded-2xl border text-[10px] font-bold leading-relaxed tracking-wide uppercase ${inferenceResult.is_plastic ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-red-50 border-red-100 text-red-700'}`}>{inferenceResult.action_status}</div>
                 </div>
               )}
             </section>
+          </div>
+        )}
+
+        {/* MARKETPLACE TAB */}
+        {activeTab === 'marketplace' && (
+          <div className="max-w-7xl mx-auto px-6 py-16 space-y-16">
+            <div className="text-center space-y-2">
+              <span className="text-[10px] font-bold text-amber-500 tracking-widest uppercase">ECOSPARK HARDWARE DISTRIBUTION</span>
+              <h3 className="text-3xl font-black text-slate-900">Commercial Hardware & Product Catalog</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <div className="bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex flex-col">
+                <div className="h-72 bg-white p-12 flex items-center justify-center"><img src="/machine.png" className="max-h-full object-contain" /></div>
+                <div className="p-10 space-y-6 flex-grow flex flex-col">
+                  <h5 className="text-xl font-black text-slate-900 uppercase tracking-tight">EcoSpark Automated Processing Cell v2.5</h5>
+                  <p className="text-sm text-slate-500 leading-relaxed">Self-contained manufacturing cell with machine vision categorization, precision thermal controllers, and interlocked molding presses.</p>
+                  <div className="flex-grow">
+                    <button onClick={() => setShowMachineSteps(!showMachineSteps)} className="w-full py-4 bg-white border border-slate-200 text-slate-900 rounded-xl font-black text-[10px] tracking-widest uppercase hover:bg-slate-50 transition mb-4">{showMachineSteps ? 'Hide Operation Steps' : 'How to Use the Machine'}</button>
+                    {showMachineSteps && (
+                      <div className="space-y-4 mb-6 bg-white p-6 rounded-2xl border border-slate-100">
+                        {[
+                          { i: "🔌", s: "Power On", d: "Plug in, check breaker and main switch." },
+                          { i: "🌡️", s: "Set Thermal", d: "Set REC700 to 200-220°C and wait for heat." },
+                          { i: "📥", s: "Feed Material", d: "Add processed raw material to hopper." },
+                          { i: "🔒", s: "Set Clamp", d: "Ensure clamping unit is securely set." },
+                          { i: "⚙️", s: "Engage Motor", d: "Press button to feed material to screw." },
+                          { i: "🧱", s: "Fill Mold", d: "Wait 3-5s for nozzle to fill the mold." },
+                          { i: "⏹️", s: "Release", d: "Let go of motor button to finish." },
+                          { i: "📦", s: "Collect", d: "Retrieve product from clamping unit." }
+                        ].map((step, idx) => (
+                          <div key={idx} className="flex gap-4 items-start">
+                            <span className="text-xl">{step.i}</span>
+                            <div>
+                              <div className="text-[10px] font-black uppercase tracking-widest text-slate-900">{step.s}</div>
+                              <p className="text-[10px] text-slate-500">{step.d}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-4 bg-amber-500 text-white rounded-xl font-black text-[10px] tracking-widest uppercase shadow-lg shadow-amber-100 hover:bg-amber-600 transition">Request Integration Specs</button>
+                </div>
+              </div>
+              <div className="bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex flex-col">
+                <div className="h-72 bg-white p-12 flex items-center justify-center"><img src="/product.jpg" className="max-h-full object-contain" /></div>
+                <div className="p-10 space-y-6 flex-grow flex flex-col">
+                  <h5 className="text-xl font-black text-slate-900 uppercase tracking-tight">High-Density Structural Modules</h5>
+                  <p className="text-sm text-slate-500 leading-relaxed">Interlocking modules fabricated from verified circular matrices. Designed for urban construction grid installations.</p>
+                  <div className="flex-grow">
+                    <ul className="text-[10px] font-bold text-slate-500 space-y-2 uppercase tracking-widest border-t border-slate-200 pt-6">
+                      <li>📍 High Viscosity Load Compression</li>
+                      <li>📍 400mm x 200mm Interlocking Grid</li>
+                      <li>📍 100% Recycled Technical Polymer</li>
+                    </ul>
+                  </div>
+                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] tracking-widest uppercase hover:bg-slate-800 transition">Submit Batch Order</button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -557,8 +580,8 @@ export default function App() {
 
       <footer className="bg-slate-50 border-t border-slate-100 px-6 py-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">© 2026 EcoSpark Manufacturing Systems Inc. All Rights Reserved.</div>
-          <div className="text-[10px] font-black text-slate-900 tracking-[0.2em] uppercase text-center md:text-right">Addis Ababa Science & Technology University (AASTU) // Integrated Engineering Team Project</div>
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">© 2024 EcoSpark Manufacturing Systems Inc. All Rights Reserved.</div>
+          <div className="text-[10px] font-black text-slate-900 tracking-[0.2em] uppercase text-center md:text-right">ARES URBAN SCIENCE & TECHNOLOGY CAMPUS // INTEGRATED INFRASTRUCTURE SYSTEMS</div>
         </div>
       </footer>
     </div>
