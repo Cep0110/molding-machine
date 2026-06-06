@@ -1,3 +1,5 @@
+ 
+
 import React, { useState } from 'react';
 
 export default function App() {
@@ -32,6 +34,22 @@ export default function App() {
 
   // Unified Connection to Hugging Face Space subdomain endpoint
   const BACKEND_URL = 'https://yani-321212-me-backend.hf.space';
+
+  // GitHub Raw Image URLs
+  const IMAGES = {
+    logo: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/logo.png',
+    machine: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/machine.png',
+    product: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/product.jpg',
+    plasticTypes: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/the%207%20types.jpg',
+    finegrained: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/finegrained.jpg',
+    pet: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/pet.jpg',
+    hdpe: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/hpde.jpg',
+    pvc: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/pvc.webp',
+    ldpe: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/ldpe.jpg',
+    pp: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/PP.png',
+    ps: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/ps.png',
+    other: 'https://raw.githubusercontent.com/Cep0110/molding-machine/main/public/other.jpg'
+  };
 
   // --- Massively Expanded RAG Knowledge Base ---
   const RAG_KNOWLEDGE_BASE = {
@@ -270,9 +288,7 @@ export default function App() {
       <header className="bg-white border-b-2 border-amber-100 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-black text-lg">E</span>
-            </div>
+            <img src={IMAGES.logo} alt="EcoSpark Logo" className="h-10 w-auto object-contain" />
             <h1 className="text-xl font-black text-slate-900 tracking-tight">ECOSPARK</h1>
           </div>
           <nav className="flex gap-2">
@@ -465,24 +481,31 @@ export default function App() {
                 {showPlasticInfo && (
                   <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl space-y-6 max-h-[500px] overflow-y-auto shadow-inner">
                     <h5 className="font-black text-slate-900 text-xs uppercase tracking-widest">Resin Identification Codes</h5>
+                    <img src={IMAGES.plasticTypes} className="w-full rounded-lg border border-slate-200" alt="7 Types of Plastic" />
                     <div className="space-y-4">
                       {[
-                        { n: "1", t: "PET/PETE", d: "Beverage bottles, food containers." },
-                        { n: "2", t: "HDPE", d: "Milk jugs, detergent bottles, pipes.", ok: true },
-                        { n: "3", t: "PVC", d: "Pipes, window frames, flooring." },
-                        { n: "4", t: "LDPE", d: "Plastic bags, shrink wrap." },
-                        { n: "5", t: "PP", d: "Food containers, bottle caps.", ok: true },
-                        { n: "6", t: "PS", d: "Foam cups, packaging, insulation." },
-                        { n: "7", t: "OTHER", d: "Polycarbonate, acrylic, bioplastics." }
+                        { n: "1", t: "PET/PETE", d: "Beverage bottles, food containers.", img: IMAGES.pet },
+                        { n: "2", t: "HDPE", d: "Milk jugs, detergent bottles, pipes.", img: IMAGES.hdpe, ok: true },
+                        { n: "3", t: "PVC", d: "Pipes, window frames, flooring.", img: IMAGES.pvc },
+                        { n: "4", t: "LDPE", d: "Plastic bags, shrink wrap.", img: IMAGES.ldpe },
+                        { n: "5", t: "PP", d: "Food containers, bottle caps.", img: IMAGES.pp, ok: true },
+                        { n: "6", t: "PS", d: "Foam cups, packaging, insulation.", img: IMAGES.ps },
+                        { n: "7", t: "OTHER", d: "Polycarbonate, acrylic, bioplastics.", img: IMAGES.other }
                       ].map(p => (
                         <div key={p.n} className={`p-4 rounded-xl border ${p.ok ? 'bg-emerald-50 border-emerald-100' : 'bg-white border-slate-100'}`}>
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-black text-xs">{p.n} - {p.t} {p.ok && "✓"}</span>
                             {p.ok && <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">Accepted</span>}
                           </div>
-                          <p className="text-xs text-slate-500">{p.d}</p>
+                          <p className="text-xs text-slate-500 mb-3">{p.d}</p>
+                          <img src={p.img} className="w-full h-24 object-contain rounded bg-white border border-slate-100" alt={p.t} />
                         </div>
                       ))}
+                    </div>
+                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                      <h6 className="font-black text-xs text-amber-900 uppercase tracking-widest mb-2">Processing Standard</h6>
+                      <img src={IMAGES.finegrained} className="w-full rounded border border-amber-200 mb-2" alt="Fine-grained processing" />
+                      <p className="text-xs text-amber-800 italic">Material must be processed to fine-grained state as shown above.</p>
                     </div>
                   </div>
                 )}
@@ -526,7 +549,7 @@ export default function App() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex flex-col hover:shadow-lg transition duration-300">
-                <div className="h-72 bg-white p-12 flex items-center justify-center"><span className="text-6xl">⚙️</span></div>
+                <div className="h-72 bg-white p-12 flex items-center justify-center"><img src={IMAGES.machine} className="max-h-full object-contain" alt="EcoSpark Machine" /></div>
                 <div className="p-10 space-y-6 flex-grow flex flex-col">
                   <h5 className="text-xl font-black text-slate-900 uppercase tracking-tight">EcoSpark Automated Processing Cell v2.5</h5>
                   <p className="text-sm text-slate-500 leading-relaxed">Self-contained manufacturing cell with machine vision categorization, precision thermal controllers, and interlocked molding presses.</p>
@@ -559,7 +582,7 @@ export default function App() {
                 </div>
               </div>
               <div className="bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex flex-col hover:shadow-lg transition duration-300">
-                <div className="h-72 bg-white p-12 flex items-center justify-center"><span className="text-6xl">🧱</span></div>
+                <div className="h-72 bg-white p-12 flex items-center justify-center"><img src={IMAGES.product} className="max-h-full object-contain" alt="High-Density Structural Modules" /></div>
                 <div className="p-10 space-y-6 flex-grow flex flex-col">
                   <h5 className="text-xl font-black text-slate-900 uppercase tracking-tight">High-Density Structural Modules</h5>
                   <p className="text-sm text-slate-500 leading-relaxed">Interlocking modules fabricated from verified circular matrices. Designed for urban construction grid installations.</p>
@@ -656,9 +679,7 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-8">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-black text-sm">E</span>
-                </div>
+                <img src={IMAGES.logo} alt="EcoSpark Logo" className="h-8 w-auto object-contain" />
                 <h3 className="text-white font-black text-lg tracking-tight">ECOSPARK</h3>
               </div>
               <p className="text-slate-400 text-xs leading-relaxed">Transforming secondary polymers into architectural value through circular manufacturing innovation.</p>
@@ -686,3 +707,4 @@ export default function App() {
     </div>
   );
 }
+Code Modification Request Based on Uploaded File - Manus
