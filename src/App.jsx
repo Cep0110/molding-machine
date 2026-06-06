@@ -1,5 +1,6 @@
  
 
+
 import React, { useState } from 'react';
 
 export default function App() {
@@ -13,7 +14,7 @@ export default function App() {
 Cloud computers
 New
 
-pasted_content_updated.txt
+ecospark_updated_v2.txt
 import React, { useState } from 'react';
 
 export default function App() {
@@ -284,13 +285,13 @@ export default function App() {
     <div className="min-h-screen bg-white flex flex-col">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-100 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex flex-col items-center gap-1">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center">
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="EcoSpark Logo" className="h-8 w-auto" />
               <h1 className="text-lg font-black text-slate-900 tracking-tight">ECOSPARK</h1>
             </div>
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">AASTU IETP</div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">AASTU IETP</div>
           </div>
           <nav className="flex gap-1">
             {[
@@ -317,10 +318,10 @@ export default function App() {
         {activeTab === 'home' && (
           <div className="max-w-7xl mx-auto px-6 py-16 space-y-24">
             {/* HERO */}
-            <section className="max-w-4xl mx-auto text-center space-y-6">
+            <section className="max-w-4xl mx-auto text-center space-y-8">
               <h2 className="text-5xl font-black text-slate-900 leading-[1.1]">Transforming Secondary Polymers Into Architectural Value</h2>
-              <p className="text-lg text-slate-500 leading-relaxed">Empowering localized circular macro-economies through high-precision computerized micro-extrusion systems designed for distributed community manufacturing applications.</p>
-              <div className="flex items-center justify-center gap-6">
+              <p className="text-lg text-slate-500 leading-relaxed max-w-3xl mx-auto">Empowering localized circular macro-economies through high-precision computerized micro-extrusion systems designed for distributed community manufacturing applications.</p>
+              <div className="flex items-center justify-center gap-6 pt-4">
                 <button onClick={() => setActiveTab('classifier')} className="bg-amber-500 text-white px-8 py-4 rounded-lg font-black text-xs tracking-widest uppercase shadow-lg shadow-amber-200 hover:bg-amber-600 transition">LAUNCH INGESTION SCANNER</button>
                 <button onClick={() => setActiveTab('marketplace')} className="text-slate-900 font-black text-xs tracking-widest uppercase border-b-2 border-amber-500 pb-1">EXPLORE MACHINE SPECIFICATIONS</button>
               </div>
