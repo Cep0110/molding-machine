@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 
 export default function App() {
@@ -268,14 +266,16 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* HEADER */}
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      {/* HEADER - ENHANCED WITH GOLD ACCENTS */}
+      <header className="bg-white border-b-2 border-amber-100 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="EcoSpark Logo" className="h-8 w-auto" />
-            <h1 className="text-lg font-black text-slate-900 tracking-tight">ECOSPARK</h1>
+            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-black text-lg">E</span>
+            </div>
+            <h1 className="text-xl font-black text-slate-900 tracking-tight">ECOSPARK</h1>
           </div>
-          <nav className="flex gap-1">
+          <nav className="flex gap-2">
             {[
               { id: 'home', label: 'HOME' },
               { id: 'chatbot', label: 'CHATBOT' },
@@ -286,7 +286,7 @@ export default function App() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-1.5 rounded text-[11px] font-bold tracking-wider transition ${activeTab === tab.id ? 'bg-amber-500 text-white' : 'text-slate-600 hover:text-amber-500'}`}
+                className={`px-5 py-2 rounded-lg text-xs font-bold tracking-wider transition ${activeTab === tab.id ? 'bg-amber-500 text-white shadow-lg shadow-amber-200' : 'text-slate-600 hover:text-amber-600 hover:bg-amber-50'}`}
               >
                 {tab.label}
               </button>
@@ -296,71 +296,151 @@ export default function App() {
       </header>
 
       <main className="flex-grow">
-        {/* HOME TAB */}
+        {/* HOME TAB - RESTRUCTURED TO MATCH VIDEO */}
         {activeTab === 'home' && (
-          <div className="max-w-7xl mx-auto px-6 py-16 space-y-24">
-            {/* HERO */}
-            <section className="max-w-4xl space-y-6">
-              <h2 className="text-5xl font-black text-slate-900 leading-[1.1]">Transforming Secondary Polymers Into Architectural Value</h2>
-              <p className="text-lg text-slate-500 leading-relaxed">EcoSpark orchestrates the transition toward decentralized circular macro-economies by deploying automated micro-extrusion systems that convert post-consumer waste into high-performance structural artifacts.</p>
-              <div className="flex items-center gap-6">
-                <button onClick={() => setActiveTab('classifier')} className="bg-amber-500 text-white px-8 py-4 rounded-lg font-black text-xs tracking-widest uppercase shadow-lg shadow-amber-200 hover:bg-amber-600 transition">LAUNCH INGESTION SCANNER</button>
-                <button onClick={() => setActiveTab('marketplace')} className="text-slate-900 font-black text-xs tracking-widest uppercase border-b-2 border-amber-500 pb-1">EXPLORE MACHINE SPECIFICATIONS</button>
+          <div className="bg-gradient-to-b from-white via-white to-slate-50">
+            {/* HERO SECTION */}
+            <section className="max-w-7xl mx-auto px-6 py-20 space-y-8">
+              <div className="max-w-4xl space-y-6">
+                <h2 className="text-6xl font-black text-slate-900 leading-[1.1] tracking-tight">
+                  Transforming Secondary Polymers Into Architectural Value
+                </h2>
+                <p className="text-lg text-slate-600 leading-relaxed max-w-2xl">
+                  EcoSpark orchestrates the transition toward decentralized circular macro-economies by deploying automated micro-extrusion systems that convert post-consumer waste into high-performance structural artifacts.
+                </p>
+                <div className="flex items-center gap-6 pt-4">
+                  <button 
+                    onClick={() => setActiveTab('classifier')} 
+                    className="bg-amber-500 text-white px-10 py-4 rounded-lg font-black text-sm tracking-widest uppercase shadow-lg shadow-amber-200 hover:bg-amber-600 transition duration-300 transform hover:scale-105"
+                  >
+                    Launch Ingestion Scanner
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('marketplace')} 
+                    className="text-slate-900 font-black text-sm tracking-widest uppercase border-b-2 border-amber-500 pb-2 hover:text-amber-600 transition"
+                  >
+                    Explore Machine Specifications
+                  </button>
+                </div>
               </div>
             </section>
 
-            {/* ENGINEERING VALUES */}
-            <section className="space-y-12">
-              <h3 className="text-2xl font-black text-slate-900">Engineering Values Measured Against UN SDGs</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* VALUE PROPOSITIONS - 4 CARDS */}
+            <section className="max-w-7xl mx-auto px-6 py-16 space-y-8">
+              <h3 className="text-3xl font-black text-slate-900">Recent Work & Growth</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { title: "Decent Work & Growth", desc: "Localized high-yield tooling." },
-                  { title: "Industry & Innovation", desc: "Computer vision networks." },
-                  { title: "Sustainable Cities", desc: "Decentralized materials circularity." },
-                  { title: "Responsible Consumption", desc: "Converting waste into architectural components." }
+                  { icon: "📊", title: "Recent Work & Growth", desc: "Localized high-yield tooling and deployment." },
+                  { icon: "🔬", title: "Industry & Innovation", desc: "Computer vision networks and AI classification." },
+                  { icon: "🏙️", title: "Sustainable Cities", desc: "Decentralized materials circularity." },
+                  { icon: "♻️", title: "Responsible Consumption", desc: "Converting waste into architectural components." }
                 ].map((v, i) => (
-                  <div key={i} className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
-                    <h4 className="text-lg font-black text-slate-900 mb-2">{v.title}</h4>
-                    <p className="text-sm text-slate-500">{v.desc}</p>
+                  <div key={i} className="bg-white border-2 border-slate-100 p-8 rounded-2xl hover:border-amber-200 hover:shadow-lg transition duration-300">
+                    <span className="text-4xl block mb-4">{v.icon}</span>
+                    <h4 className="text-base font-black text-slate-900 mb-3 uppercase tracking-wide">{v.title}</h4>
+                    <p className="text-sm text-slate-600 leading-relaxed">{v.desc}</p>
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* LIFECYCLE PIPELINE */}
-            <section className="space-y-12">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-amber-500 tracking-[0.2em] uppercase">OPERATIONAL FLOW PIPELINE</span>
-                <h3 className="text-2xl font-black text-slate-900">The Lifecycle Pipeline Process</h3>
+            {/* LIFECYCLE PIPELINE PROCESS */}
+            <section className="max-w-7xl mx-auto px-6 py-16 space-y-12">
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-amber-600 tracking-[0.2em] uppercase">Operational Flow Pipeline</span>
+                <h3 className="text-3xl font-black text-slate-900">The Lifecycle Pipeline Process</h3>
               </div>
+              
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {[
-                  { icon: "🛍️", title: "Source Collection", desc: "Aggregate sourcing and sanitization." },
-                  { icon: "👁️", title: "Vision Sorting", desc: "High-speed digital classification." },
-                  { icon: "⚙️", title: "Controlled Extrusion", desc: "Precision PID-induced melting." },
-                  { icon: "🧱", title: "Final Compression Mold", desc: "Settling into engineering modules." }
+                  { 
+                    icon: "🛍️", 
+                    title: "Source Collection", 
+                    desc: "Aggregate sourcing and sanitization of post-consumer waste materials.",
+                    step: "01"
+                  },
+                  { 
+                    icon: "👁️", 
+                    title: "Vision Sorting", 
+                    desc: "High-speed digital classification using computer vision networks.",
+                    step: "02"
+                  },
+                  { 
+                    icon: "⚙️", 
+                    title: "Controlled Extrusion", 
+                    desc: "Precision PID-induced melting and thermal configuration.",
+                    step: "03"
+                  },
+                  { 
+                    icon: "🧱", 
+                    title: "Final Compression Mold", 
+                    desc: "Settling into engineering modules and structural components.",
+                    step: "04"
+                  }
                 ].map((p, i) => (
-                  <div key={i} className="space-y-4">
-                    <span className="text-4xl">{p.icon}</span>
-                    <h4 className="text-base font-black text-slate-900">{p.title}</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed">{p.desc}</p>
+                  <div key={i} className="relative">
+                    <div className="bg-white border-2 border-amber-100 rounded-2xl p-8 h-full hover:shadow-lg transition duration-300">
+                      <div className="absolute -top-4 -left-4 w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-black text-sm">
+                        {p.step}
+                      </div>
+                      <span className="text-5xl block mb-4">{p.icon}</span>
+                      <h4 className="text-base font-black text-slate-900 mb-3 uppercase tracking-wide">{p.title}</h4>
+                      <p className="text-sm text-slate-600 leading-relaxed">{p.desc}</p>
+                    </div>
+                    {i < 3 && (
+                      <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-1 bg-gradient-to-r from-amber-400 to-transparent"></div>
+                    )}
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* CONTACT */}
-            <section className="max-w-2xl mx-auto space-y-8 bg-slate-50 p-12 rounded-3xl border border-slate-100" id="contact">
-              <h3 className="text-2xl font-black text-slate-900 text-center">Contact Technical Command</h3>
-              <form onSubmit={handleContactSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <input type="text" placeholder="Full Name" value={contactForm.name} onChange={e => setContactForm({ ...contactForm, name: e.target.value })} className="bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition w-full" />
-                  <input type="email" placeholder="Inquiry Email Address" value={contactForm.email} onChange={e => setContactForm({ ...contactForm, email: e.target.value })} className="bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition w-full" />
-                </div>
-                <textarea placeholder="Specify system inquiry data parameters..." value={contactForm.message} onChange={e => setContactForm({ ...contactForm, message: e.target.value })} rows="5" className="bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition w-full resize-none" />
-                <button type="submit" className="w-full py-4 bg-amber-500 text-white rounded-xl font-black text-xs tracking-widest uppercase shadow-lg shadow-amber-100 hover:bg-amber-600 transition">TRANSMIT TELEMETRY PACKAGE</button>
-                {contactSuccess && <div className="text-emerald-600 text-[10px] font-bold text-center uppercase tracking-widest">✅ Data packet transmitted successfully</div>}
-              </form>
+            {/* CONTACT SECTION */}
+            <section className="max-w-2xl mx-auto px-6 py-16 space-y-8" id="contact">
+              <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-200 p-12 rounded-3xl">
+                <h3 className="text-2xl font-black text-slate-900 text-center mb-8">Contact Technical Command</h3>
+                <form onSubmit={handleContactSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <input 
+                      type="text" 
+                      placeholder="Full Name" 
+                      value={contactForm.name} 
+                      onChange={e => setContactForm({ ...contactForm, name: e.target.value })} 
+                      className="bg-white border-2 border-amber-200 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition w-full font-medium" 
+                    />
+                    <input 
+                      type="email" 
+                      placeholder="Inquiry Email Address" 
+                      value={contactForm.email} 
+                      onChange={e => setContactForm({ ...contactForm, email: e.target.value })} 
+                      className="bg-white border-2 border-amber-200 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition w-full font-medium" 
+                    />
+                  </div>
+                  <textarea 
+                    placeholder="Specify system inquiry data parameters..." 
+                    value={contactForm.message} 
+                    onChange={e => setContactForm({ ...contactForm, message: e.target.value })} 
+                    rows="5" 
+                    className="bg-white border-2 border-amber-200 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition w-full resize-none font-medium" 
+                  />
+                  <button 
+                    type="submit" 
+                    className="w-full py-4 bg-amber-500 text-white rounded-xl font-black text-sm tracking-widest uppercase shadow-lg shadow-amber-200 hover:bg-amber-600 transition duration-300 transform hover:scale-105"
+                  >
+                    Transmit Telemetry Package
+                  </button>
+                  {contactSuccess && (
+                    <div className="text-emerald-700 text-xs font-bold text-center uppercase tracking-widest bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                      ✅ Data packet transmitted successfully
+                    </div>
+                  )}
+                  {contactError && (
+                    <div className="text-red-700 text-xs font-bold text-center uppercase tracking-widest bg-red-50 p-4 rounded-xl border border-red-200">
+                      ⚠️ {contactError}
+                    </div>
+                  )}
+                </form>
+              </div>
             </section>
           </div>
         )}
@@ -370,46 +450,39 @@ export default function App() {
           <div className="max-w-5xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 gap-12">
             <section className="space-y-8">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-amber-500 tracking-widest uppercase">MACHINE VISION PORTAL</span>
-                <h4 className="text-xl font-black text-slate-900">Physical Aggregate Target Core Ingestion</h4>
+                <span className="text-xs font-bold text-amber-500 tracking-widest uppercase">Machine Vision Portal</span>
+                <h4 className="text-2xl font-black text-slate-900">Physical Aggregate Target Core Ingestion</h4>
               </div>
               <div className="border-2 border-dashed border-slate-200 bg-slate-50 rounded-2xl h-80 flex flex-col items-center justify-center relative overflow-hidden p-6">
-                {imagePreview ? <img src={imagePreview} className="w-full h-full object-contain rounded-xl" /> : <div className="text-center text-slate-400 space-y-2"><span className="text-5xl block">📷</span><span className="text-[10px] font-bold uppercase tracking-widest">Mount Material Feed</span></div>}
-                {analyzing && <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center space-y-4"><div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div><span className="text-[10px] font-bold tracking-widest text-amber-600 animate-pulse uppercase">Executing Scan...</span></div>}
+                {imagePreview ? <img src={imagePreview} className="w-full h-full object-contain rounded-xl" /> : <div className="text-center text-slate-400 space-y-2"><span className="text-5xl block">📷</span><span className="text-xs font-bold uppercase tracking-widest">Mount Material Feed</span></div>}
+                {analyzing && <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center space-y-4"><div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div><span className="text-xs font-bold tracking-widest text-amber-600 animate-pulse uppercase">Executing Scan...</span></div>}
               </div>
               <div className="space-y-3">
                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" id="file-upload" />
-                <label htmlFor="file-upload" className="block w-full text-center bg-slate-100 py-4 rounded-xl font-black text-[10px] tracking-widest uppercase cursor-pointer hover:bg-slate-200 transition">{selectedFile ? 'Swap Sample' : 'Select Media'}</label>
-                <button onClick={triggerImageClassification} disabled={!selectedFile || analyzing} className={`w-full py-4 rounded-xl font-black text-[10px] tracking-widest uppercase transition ${selectedFile && !analyzing ? 'bg-amber-500 text-white shadow-lg shadow-amber-100' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}>Analyze Compound</button>
-                <button onClick={() => setShowPlasticInfo(!showPlasticInfo)} className="w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-black text-[10px] tracking-widest uppercase hover:bg-slate-50 transition">{showPlasticInfo ? 'Hide Details' : 'More About Plastics'}</button>
+                <label htmlFor="file-upload" className="block w-full text-center bg-slate-100 py-4 rounded-xl font-black text-xs tracking-widest uppercase cursor-pointer hover:bg-slate-200 transition">{selectedFile ? 'Swap Sample' : 'Select Media'}</label>
+                <button onClick={triggerImageClassification} disabled={!selectedFile || analyzing} className={`w-full py-4 rounded-xl font-black text-xs tracking-widest uppercase transition ${selectedFile && !analyzing ? 'bg-amber-500 text-white shadow-lg shadow-amber-100' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}>Analyze Compound Structure</button>
+                <button onClick={() => setShowPlasticInfo(!showPlasticInfo)} className="w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-black text-xs tracking-widest uppercase hover:bg-slate-50 transition">{showPlasticInfo ? 'Hide Details' : 'More About Plastics'}</button>
                 {showPlasticInfo && (
                   <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl space-y-6 max-h-[500px] overflow-y-auto shadow-inner">
                     <h5 className="font-black text-slate-900 text-xs uppercase tracking-widest">Resin Identification Codes</h5>
-                    <img src="/the 7 types.jpg" className="w-full rounded-lg border border-slate-200" />
                     <div className="space-y-4">
                       {[
-                        { n: "1", t: "PET/PETE", d: "Beverage bottles, food containers.", img: "/pet.jpg" },
-                        { n: "2", t: "HDPE", d: "Milk jugs, detergent bottles, pipes.", img: "/hpde.jpg", ok: true },
-                        { n: "3", t: "PVC", d: "Pipes, window frames, flooring.", img: "/pvc.webp" },
-                        { n: "4", t: "LDPE", d: "Plastic bags, shrink wrap.", img: "/ldpe.jpg" },
-                        { n: "5", t: "PP", d: "Food containers, bottle caps.", img: "/PP.png", ok: true },
-                        { n: "6", t: "PS", d: "Foam cups, packaging, insulation.", img: "/ps.png" },
-                        { n: "7", t: "OTHER", d: "Polycarbonate, acrylic, bioplastics.", img: "/other.jpg" }
+                        { n: "1", t: "PET/PETE", d: "Beverage bottles, food containers." },
+                        { n: "2", t: "HDPE", d: "Milk jugs, detergent bottles, pipes.", ok: true },
+                        { n: "3", t: "PVC", d: "Pipes, window frames, flooring." },
+                        { n: "4", t: "LDPE", d: "Plastic bags, shrink wrap." },
+                        { n: "5", t: "PP", d: "Food containers, bottle caps.", ok: true },
+                        { n: "6", t: "PS", d: "Foam cups, packaging, insulation." },
+                        { n: "7", t: "OTHER", d: "Polycarbonate, acrylic, bioplastics." }
                       ].map(p => (
                         <div key={p.n} className={`p-4 rounded-xl border ${p.ok ? 'bg-emerald-50 border-emerald-100' : 'bg-white border-slate-100'}`}>
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-black text-xs">{p.n} - {p.t} {p.ok && "✓"}</span>
-                            {p.ok && <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Accepted</span>}
+                            {p.ok && <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">Accepted</span>}
                           </div>
-                          <p className="text-[10px] text-slate-500 mb-3">{p.d}</p>
-                          <img src={p.img} className="w-full h-24 object-contain rounded bg-white border border-slate-100" />
+                          <p className="text-xs text-slate-500">{p.d}</p>
                         </div>
                       ))}
-                    </div>
-                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-100">
-                      <h6 className="font-black text-[10px] text-amber-900 uppercase tracking-widest mb-2">Processing Standard</h6>
-                      <img src="/finegrained.jpg" className="w-full rounded border border-amber-200 mb-2" />
-                      <p className="text-[9px] text-amber-800 italic">Material must be processed to fine-grained state as shown above.</p>
                     </div>
                   </div>
                 )}
@@ -417,27 +490,27 @@ export default function App() {
             </section>
 
             <section className="bg-slate-50 border border-slate-100 rounded-3xl p-8 flex flex-col justify-center min-h-[500px]">
-              <h3 className="text-[10px] font-black text-amber-500 tracking-widest uppercase mb-6">AUTOMATED PROCESS CONFIGURATOR</h3>
-              {classifierError && <div className="bg-red-50 text-red-600 p-4 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-red-100 mb-6">⚠️ {classifierError}</div>}
+              <h3 className="text-xs font-black text-amber-500 tracking-widest uppercase mb-6">Automated Process Configurator</h3>
+              {classifierError && <div className="bg-red-50 text-red-600 p-4 rounded-xl text-xs font-bold uppercase tracking-widest border border-red-100 mb-6">⚠️ {classifierError}</div>}
               {!inferenceResult && !analyzing && <div className="text-center text-slate-300 py-24 italic text-xs font-bold uppercase tracking-widest">Awaiting ingestion data...</div>}
               {inferenceResult && (
                 <div className="space-y-8">
                   <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Composition Profile</span>
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-2">Composition Profile</span>
                     <div className={`text-3xl font-black tracking-tight ${inferenceResult.is_plastic ? 'text-amber-500' : 'text-red-500'}`}>{inferenceResult.detected_material}</div>
-                    <div className="mt-2 text-[10px] font-bold text-slate-500">CONFIDENCE: <span className="text-amber-500">{inferenceResult.confidence}%</span></div>
+                    <div className="mt-2 text-xs font-bold text-slate-500">CONFIDENCE: <span className="text-amber-500">{inferenceResult.confidence}%</span></div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 text-center">
-                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Thermal Set</span>
+                      <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-1">Thermal Set</span>
                       <span className="text-2xl font-black text-slate-900">{inferenceResult.recommendedTemp}°C</span>
                     </div>
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 text-center">
-                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cooling Cycle</span>
+                      <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-1">Cooling Cycle</span>
                       <span className="text-2xl font-black text-slate-900">{inferenceResult.recommendedCooling}s</span>
                     </div>
                   </div>
-                  <div className={`p-5 rounded-2xl border text-[10px] font-bold leading-relaxed tracking-wide uppercase ${inferenceResult.is_plastic ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-red-50 border-red-100 text-red-700'}`}>{inferenceResult.action_status}</div>
+                  <div className={`p-5 rounded-2xl border text-xs font-bold leading-relaxed tracking-wide uppercase ${inferenceResult.is_plastic ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-red-50 border-red-100 text-red-700'}`}>{inferenceResult.action_status}</div>
                 </div>
               )}
             </section>
@@ -448,17 +521,17 @@ export default function App() {
         {activeTab === 'marketplace' && (
           <div className="max-w-7xl mx-auto px-6 py-16 space-y-16">
             <div className="text-center space-y-2">
-              <span className="text-[10px] font-bold text-amber-500 tracking-widest uppercase">ECOSPARK HARDWARE DISTRIBUTION</span>
+              <span className="text-xs font-bold text-amber-500 tracking-widest uppercase">EcoSpark Hardware Distribution</span>
               <h3 className="text-3xl font-black text-slate-900">Commercial Hardware & Product Catalog</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div className="bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex flex-col">
-                <div className="h-72 bg-white p-12 flex items-center justify-center"><img src="/machine.png" className="max-h-full object-contain" /></div>
+              <div className="bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex flex-col hover:shadow-lg transition duration-300">
+                <div className="h-72 bg-white p-12 flex items-center justify-center"><span className="text-6xl">⚙️</span></div>
                 <div className="p-10 space-y-6 flex-grow flex flex-col">
                   <h5 className="text-xl font-black text-slate-900 uppercase tracking-tight">EcoSpark Automated Processing Cell v2.5</h5>
                   <p className="text-sm text-slate-500 leading-relaxed">Self-contained manufacturing cell with machine vision categorization, precision thermal controllers, and interlocked molding presses.</p>
                   <div className="flex-grow">
-                    <button onClick={() => setShowMachineSteps(!showMachineSteps)} className="w-full py-4 bg-white border border-slate-200 text-slate-900 rounded-xl font-black text-[10px] tracking-widest uppercase hover:bg-slate-50 transition mb-4">{showMachineSteps ? 'Hide Operation Steps' : 'How to Use the Machine'}</button>
+                    <button onClick={() => setShowMachineSteps(!showMachineSteps)} className="w-full py-4 bg-white border border-slate-200 text-slate-900 rounded-xl font-black text-xs tracking-widest uppercase hover:bg-slate-50 transition mb-4">{showMachineSteps ? 'Hide Operation Steps' : 'How to Use the Machine'}</button>
                     {showMachineSteps && (
                       <div className="space-y-4 mb-6 bg-white p-6 rounded-2xl border border-slate-100">
                         {[
@@ -474,30 +547,30 @@ export default function App() {
                           <div key={idx} className="flex gap-4 items-start">
                             <span className="text-xl">{step.i}</span>
                             <div>
-                              <div className="text-[10px] font-black uppercase tracking-widest text-slate-900">{step.s}</div>
-                              <p className="text-[10px] text-slate-500">{step.d}</p>
+                              <div className="text-xs font-black uppercase tracking-widest text-slate-900">{step.s}</div>
+                              <p className="text-xs text-slate-500">{step.d}</p>
                             </div>
                           </div>
                         ))}
                       </div>
                     )}
                   </div>
-                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-4 bg-amber-500 text-white rounded-xl font-black text-[10px] tracking-widest uppercase shadow-lg shadow-amber-100 hover:bg-amber-600 transition">Request Integration Specs</button>
+                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-4 bg-amber-500 text-white rounded-xl font-black text-xs tracking-widest uppercase shadow-lg shadow-amber-100 hover:bg-amber-600 transition">Request Integration Specs</button>
                 </div>
               </div>
-              <div className="bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex flex-col">
-                <div className="h-72 bg-white p-12 flex items-center justify-center"><img src="/product.jpg" className="max-h-full object-contain" /></div>
+              <div className="bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex flex-col hover:shadow-lg transition duration-300">
+                <div className="h-72 bg-white p-12 flex items-center justify-center"><span className="text-6xl">🧱</span></div>
                 <div className="p-10 space-y-6 flex-grow flex flex-col">
                   <h5 className="text-xl font-black text-slate-900 uppercase tracking-tight">High-Density Structural Modules</h5>
                   <p className="text-sm text-slate-500 leading-relaxed">Interlocking modules fabricated from verified circular matrices. Designed for urban construction grid installations.</p>
                   <div className="flex-grow">
-                    <ul className="text-[10px] font-bold text-slate-500 space-y-2 uppercase tracking-widest border-t border-slate-200 pt-6">
+                    <ul className="text-xs font-bold text-slate-500 space-y-2 uppercase tracking-widest border-t border-slate-200 pt-6">
                       <li>📍 High Viscosity Load Compression</li>
                       <li>📍 400mm x 200mm Interlocking Grid</li>
                       <li>📍 100% Recycled Technical Polymer</li>
                     </ul>
                   </div>
-                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] tracking-widest uppercase hover:bg-slate-800 transition">Submit Batch Order</button>
+                  <button onClick={() => { setActiveTab('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-xs tracking-widest uppercase hover:bg-slate-800 transition">Submit Batch Order</button>
                 </div>
               </div>
             </div>
@@ -508,26 +581,26 @@ export default function App() {
         {activeTab === 'chatbot' && (
           <div className="max-w-4xl mx-auto px-6 py-12 h-[700px] flex flex-col">
             <div className="bg-slate-50 border border-slate-100 rounded-3xl flex-grow flex flex-col overflow-hidden shadow-sm">
-              <div className="p-6 border-b border-slate-200 bg-white flex justify-between items-center">
-                <div><h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">EcoSpark RAG System</h3><p className="text-[9px] text-amber-500 font-bold uppercase tracking-widest">Knowledge Base Core Node Active</p></div>
+              <div className="p-6 border-b border-slate-200 bg-white flex justify-between items-center rounded-t-3xl">
+                <div><h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">EcoSpark Retrieval-Augmented System</h3><p className="text-xs text-amber-500 font-bold uppercase tracking-widest">Knowledge Base Core Node Active</p></div>
                 <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
               </div>
               <div className="flex-grow p-8 overflow-y-auto space-y-6">
                 {chatMessages.map((m, idx) => (
                   <div key={idx} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] p-4 rounded-2xl text-[11px] font-bold leading-relaxed ${m.sender === 'user' ? 'bg-amber-500 text-white rounded-tr-none' : 'bg-white border border-slate-100 text-slate-600 rounded-tl-none shadow-sm'}`}>{m.text}</div>
+                    <div className={`max-w-[80%] p-4 rounded-2xl text-xs font-bold leading-relaxed ${m.sender === 'user' ? 'bg-amber-500 text-white rounded-tr-none' : 'bg-white border border-slate-100 text-slate-600 rounded-tl-none shadow-sm'}`}>{m.text}</div>
                   </div>
                 ))}
               </div>
-              <div className="p-6 bg-white border-t border-slate-100 space-y-4">
+              <div className="p-6 bg-white border-t border-slate-100 space-y-4 rounded-b-3xl">
                 <div className="flex flex-wrap gap-2">
                   {["Where is this project engineered?", "How is thermal control maintained?", "What specific polymer classes are supported?", "What are the 7 types of plastic?", "How to use the machine?"].map((q, i) => (
-                    <button key={i} onClick={() => handleFAQClick(q)} className="bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-[9px] font-black text-slate-500 uppercase tracking-widest transition">{q}</button>
+                    <button key={i} onClick={() => handleFAQClick(q)} className="bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-black text-slate-500 uppercase tracking-widest transition">{q}</button>
                   ))}
                 </div>
                 <form onSubmit={handleSendMessage} className="flex gap-3">
                   <input type="text" placeholder="Query semantic RAG engine..." value={userInput} onChange={e => setUserInput(e.target.value)} className="flex-grow bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition" />
-                  <button type="submit" className="bg-amber-500 text-white px-8 rounded-xl font-black text-[10px] tracking-widest uppercase hover:bg-amber-600 transition">Query</button>
+                  <button type="submit" className="bg-amber-500 text-white px-8 rounded-xl font-black text-xs tracking-widest uppercase hover:bg-amber-600 transition">Query</button>
                 </form>
               </div>
             </div>
@@ -539,36 +612,36 @@ export default function App() {
           <div className="max-w-6xl mx-auto px-6 py-12">
             {!isAdminLoggedIn ? (
               <div className="max-w-md mx-auto bg-slate-50 border border-slate-100 p-10 rounded-3xl text-center shadow-sm">
-                <span className="text-5xl block mb-4">🔒</span>
-                <h4 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">Operator Hub</h4>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-8">Restricted Utility Access</p>
+                <span className="text-6xl block mb-4">🔒</span>
+                <h4 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">Secure Core Administration Portal</h4>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-8">Restricted Utility Access</p>
                 <form onSubmit={handleAdminLogin} className="space-y-6 text-left">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Operator ID</label>
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Access Key</label>
                     <input type="text" placeholder="admin" value={username} onChange={e => setUsername(e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl p-4 text-xs focus:outline-none focus:border-amber-500 transition" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Security Token</label>
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Security Token</label>
                     <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl p-4 text-xs focus:outline-none focus:border-amber-500 transition" />
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-2 block">Hint: admin / aastu11</span>
+                    <span className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-2 block">Hint: admin / aastu11</span>
                   </div>
-                  <button type="submit" className="w-full py-4 bg-amber-500 text-white rounded-xl font-black text-[10px] tracking-widest uppercase shadow-lg shadow-amber-100 hover:bg-amber-600 transition">Verify Authorization</button>
+                  <button type="submit" className="w-full py-4 bg-amber-500 text-white rounded-xl font-black text-xs tracking-widest uppercase shadow-lg shadow-amber-100 hover:bg-amber-600 transition">Verify Administrative Access</button>
                 </form>
               </div>
             ) : (
               <div className="space-y-8">
                 <div className="flex justify-between items-center bg-slate-900 p-8 rounded-3xl text-white">
-                  <div><h4 className="text-2xl font-black tracking-tight uppercase">Master Control Matrix</h4><p className="text-[10px] text-amber-500 font-bold uppercase tracking-widest">Live Ingestion Feeds & Telemetry Monitoring</p></div>
-                  <button onClick={() => { setIsAdminLoggedIn(false); setPassword(''); }} className="px-6 py-2 bg-red-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 transition">Terminate Session</button>
+                  <div><h4 className="text-2xl font-black tracking-tight uppercase">Master Control Matrix</h4><p className="text-xs text-amber-500 font-bold uppercase tracking-widest">Real-Time Classification Status Log</p></div>
+                  <button onClick={() => { setIsAdminLoggedIn(false); setPassword(''); }} className="px-6 py-2 bg-red-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-600 transition">Terminate Session Authorization</button>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   <div className="lg:col-span-2 bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
-                    <h5 className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-6">Classification Stream Logs</h5>
-                    <div className="overflow-x-auto"><table className="w-full text-left text-[10px] font-bold uppercase tracking-wider"><thead className="text-slate-400 border-b border-slate-100"><tr className="pb-4"><th className="pb-4">Timestamp</th><th className="pb-4">Target Profile</th><th className="pb-4">Confidence</th><th className="pb-4 text-right">Matrix Status</th></tr></thead><tbody className="text-slate-600 divide-y divide-slate-50">{classificationLogs.length === 0 ? <tr><td colSpan="4" className="py-12 text-center italic text-slate-300">No telemetry data recorded.</td></tr> : classificationLogs.map((log, i) => <tr key={i}><td className="py-4">{log.timestamp}</td><td className="py-4 text-slate-900">{log.material}</td><td className="py-4 text-amber-500">{log.confidence}</td><td className="py-4 text-right"><span className={`px-3 py-1 rounded-lg ${log.status.includes('Approved') ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>{log.status}</span></td></tr>)}</tbody></table></div>
+                    <h5 className="text-xs font-black text-amber-500 uppercase tracking-widest mb-6">Real-Time Classification Status Log</h5>
+                    <div className="overflow-x-auto"><table className="w-full text-left text-xs font-bold uppercase tracking-wider"><thead className="text-slate-400 border-b border-slate-100"><tr className="pb-4"><th className="pb-4">Timestamp</th><th className="pb-4">Material</th><th className="pb-4">Confidence</th><th className="pb-4 text-right">Status</th></tr></thead><tbody className="text-slate-600 divide-y divide-slate-50">{classificationLogs.length === 0 ? <tr><td colSpan="4" className="py-12 text-center italic text-slate-300">No telemetry data recorded.</td></tr> : classificationLogs.map((log, i) => <tr key={i}><td className="py-4">{log.timestamp}</td><td className="py-4 text-slate-900">{log.material}</td><td className="py-4 text-amber-500">{log.confidence}</td><td className="py-4 text-right"><span className={`px-3 py-1 rounded-lg text-xs font-bold ${log.status.includes('Approved') ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>{log.status}</span></td></tr>)}</tbody></table></div>
                   </div>
                   <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm space-y-6">
-                    <h5 className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Interface Pipeline</h5>
-                    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">{customerInquiries.length === 0 ? <div className="text-center text-slate-300 py-24 italic text-[10px] font-bold uppercase tracking-widest">No traffic detected.</div> : customerInquiries.map((inq, i) => <div key={i} className="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-3"><div className="flex justify-between items-start"><div className="font-black text-slate-900 text-[10px] uppercase tracking-widest">{inq.name}</div><span className="text-[8px] font-black bg-white px-2 py-1 rounded-lg border border-slate-200 uppercase">Inquiry</span></div><div className="text-[9px] text-amber-500 font-bold break-all uppercase tracking-widest">{inq.email}</div><p className="text-[10px] text-slate-500 leading-relaxed font-bold bg-white p-4 rounded-xl border border-slate-100 italic">"{inq.msg}"</p></div>)}</div>
+                    <h5 className="text-xs font-black text-amber-500 uppercase tracking-widest">Interface Pipeline</h5>
+                    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">{customerInquiries.length === 0 ? <div className="text-center text-slate-300 py-24 italic text-xs font-bold uppercase tracking-widest">No traffic detected.</div> : customerInquiries.map((inq, i) => <div key={i} className="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-3"><div className="flex justify-between items-start"><div className="font-black text-slate-900 text-xs uppercase tracking-widest">{inq.name}</div><span className="text-xs font-black bg-white px-2 py-1 rounded-lg border border-slate-200 uppercase">Inquiry</span></div><div className="text-xs text-amber-500 font-bold break-all uppercase tracking-widest">{inq.email}</div><p className="text-xs text-slate-500 leading-relaxed font-bold bg-white p-4 rounded-xl border border-slate-100 italic">"{inq.msg}"</p></div>)}</div>
                   </div>
                 </div>
               </div>
@@ -577,10 +650,37 @@ export default function App() {
         )}
       </main>
 
-      <footer className="bg-slate-50 border-t border-slate-100 px-6 py-12">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">© 2024 EcoSpark Manufacturing Systems Inc. All Rights Reserved.</div>
-          <div className="text-[10px] font-black text-slate-900 tracking-[0.2em] uppercase text-center md:text-right">ARES URBAN SCIENCE & TECHNOLOGY CAMPUS // INTEGRATED INFRASTRUCTURE SYSTEMS</div>
+      {/* FOOTER - ENHANCED */}
+      <footer className="bg-slate-900 border-t-2 border-amber-500 px-6 py-12 mt-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-black text-sm">E</span>
+                </div>
+                <h3 className="text-white font-black text-lg tracking-tight">ECOSPARK</h3>
+              </div>
+              <p className="text-slate-400 text-xs leading-relaxed">Transforming secondary polymers into architectural value through circular manufacturing innovation.</p>
+            </div>
+            <div className="space-y-4">
+              <h4 className="text-white font-black text-sm uppercase tracking-widest">Quick Links</h4>
+              <ul className="space-y-2 text-xs text-slate-400">
+                <li><button onClick={() => setActiveTab('home')} className="hover:text-amber-500 transition">Home</button></li>
+                <li><button onClick={() => setActiveTab('classifier')} className="hover:text-amber-500 transition">Classifier</button></li>
+                <li><button onClick={() => setActiveTab('marketplace')} className="hover:text-amber-500 transition">Marketplace</button></li>
+                <li><button onClick={() => setActiveTab('chatbot')} className="hover:text-amber-500 transition">Support</button></li>
+              </ul>
+            </div>
+            <div className="space-y-4">
+              <h4 className="text-white font-black text-sm uppercase tracking-widest">Contact</h4>
+              <p className="text-xs text-slate-400">AASTU Campus<br/>Addis Ababa, Ethiopia<br/>Integrated Engineering Team Project</p>
+            </div>
+          </div>
+          <div className="border-t border-slate-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">© 2024 EcoSpark Manufacturing Systems Inc. All Rights Reserved.</div>
+            <div className="text-xs font-black text-amber-500 tracking-[0.2em] uppercase text-center">ARES URBAN SCIENCE & TECHNOLOGY CAMPUS</div>
+          </div>
         </div>
       </footer>
     </div>
