@@ -1,12 +1,3 @@
-import React, { useState } from 'react';
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState
-
-
 
 
 import React, { useState } from 'react';
@@ -276,16 +267,13 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-100 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="EcoSpark Logo" className="h-8 w-auto" />
-            <div>
-              <h1 className="text-lg font-black text-slate-900 tracking-tight">ECOSPARK</h1>
-              <p className="text-[8px] font-bold text-amber-500 uppercase tracking-[0.2em]">AASTU IETP GROUP 11</p>
-            </div>
+            <h1 className="text-lg font-black text-slate-900 tracking-tight">ECOSPARK</h1>
           </div>
           <nav className="flex gap-1">
             {[
@@ -311,29 +299,29 @@ export default function App() {
         {/* HOME TAB */}
         {activeTab === 'home' && (
           <div className="max-w-7xl mx-auto px-6 py-16 space-y-24">
-            {/* HERO - CENTERED */}
-            <section className="text-center max-w-4xl mx-auto space-y-8">
+            {/* HERO */}
+            <section className="max-w-4xl space-y-6">
               <h2 className="text-5xl font-black text-slate-900 leading-[1.1]">Transforming Secondary Polymers Into Architectural Value</h2>
-              <p className="text-lg text-slate-500 leading-relaxed max-w-3xl mx-auto">EcoSpark orchestrates the transition toward decentralized circular macro-economies by deploying automated micro-extrusion systems that convert post-consumer waste into high-performance structural artifacts.</p>
-              <div className="flex items-center justify-center gap-6 pt-4">
+              <p className="text-lg text-slate-500 leading-relaxed">EcoSpark orchestrates the transition toward decentralized circular macro-economies by deploying automated micro-extrusion systems that convert post-consumer waste into high-performance structural artifacts.</p>
+              <div className="flex items-center gap-6">
                 <button onClick={() => setActiveTab('classifier')} className="bg-amber-500 text-white px-8 py-4 rounded-lg font-black text-xs tracking-widest uppercase shadow-lg shadow-amber-200 hover:bg-amber-600 transition">LAUNCH INGESTION SCANNER</button>
                 <button onClick={() => setActiveTab('marketplace')} className="text-slate-900 font-black text-xs tracking-widest uppercase border-b-2 border-amber-500 pb-1">EXPLORE MACHINE SPECIFICATIONS</button>
               </div>
             </section>
 
-            {/* ENGINEERING VALUES - EXACT PLACEMENT */}
+            {/* ENGINEERING VALUES */}
             <section className="space-y-12">
-              <h3 className="text-2xl font-black text-slate-900 text-center">Engineering Values Measured Against UN SDGs</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              <h3 className="text-2xl font-black text-slate-900">Engineering Values Measured Against UN SDGs</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {[
                   { title: "Decent Work & Growth", desc: "Localized high-yield tooling." },
                   { title: "Industry & Innovation", desc: "Computer vision networks." },
                   { title: "Sustainable Cities", desc: "Decentralized materials circularity." },
                   { title: "Responsible Consumption", desc: "Converting waste into architectural components." }
                 ].map((v, i) => (
-                  <div key={i} className="bg-slate-50 p-8 rounded-2xl border border-slate-100 text-center">
-                    <h4 className="text-lg font-black text-slate-900 mb-2 uppercase tracking-tight">{v.title}</h4>
-                    <p className="text-sm text-slate-500 font-medium">{v.desc}</p>
+                  <div key={i} className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
+                    <h4 className="text-lg font-black text-slate-900 mb-2">{v.title}</h4>
+                    <p className="text-sm text-slate-500">{v.desc}</p>
                   </div>
                 ))}
               </div>
@@ -341,21 +329,21 @@ export default function App() {
 
             {/* LIFECYCLE PIPELINE */}
             <section className="space-y-12">
-              <div className="text-center space-y-1">
+              <div className="space-y-1">
                 <span className="text-[10px] font-bold text-amber-500 tracking-[0.2em] uppercase">OPERATIONAL FLOW PIPELINE</span>
                 <h3 className="text-2xl font-black text-slate-900">The Lifecycle Pipeline Process</h3>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {[
                   { icon: "🛍️", title: "Source Collection", desc: "Aggregate sourcing and sanitization." },
                   { icon: "👁️", title: "Vision Sorting", desc: "High-speed digital classification." },
                   { icon: "⚙️", title: "Controlled Extrusion", desc: "Precision PID-induced melting." },
                   { icon: "🧱", title: "Final Compression Mold", desc: "Settling into engineering modules." }
                 ].map((p, i) => (
-                  <div key={i} className="text-center space-y-4">
-                    <span className="text-5xl block mb-4">{p.icon}</span>
-                    <h4 className="text-base font-black text-slate-900 uppercase tracking-tight">{p.title}</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed font-medium">{p.desc}</p>
+                  <div key={i} className="space-y-4">
+                    <span className="text-4xl">{p.icon}</span>
+                    <h4 className="text-base font-black text-slate-900">{p.title}</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed">{p.desc}</p>
                   </div>
                 ))}
               </div>
@@ -366,19 +354,10 @@ export default function App() {
               <h3 className="text-2xl font-black text-slate-900 text-center">Contact Technical Command</h3>
               <form onSubmit={handleContactSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                    <input type="text" placeholder="Your name" value={contactForm.name} onChange={e => setContactForm({ ...contactForm, name: e.target.value })} className="bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition w-full" />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Inquiry Email Address</label>
-                    <input type="email" placeholder="your@email.com" value={contactForm.email} onChange={e => setContactForm({ ...contactForm, email: e.target.value })} className="bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition w-full" />
-                  </div>
+                  <input type="text" placeholder="Full Name" value={contactForm.name} onChange={e => setContactForm({ ...contactForm, name: e.target.value })} className="bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition w-full" />
+                  <input type="email" placeholder="Inquiry Email Address" value={contactForm.email} onChange={e => setContactForm({ ...contactForm, email: e.target.value })} className="bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition w-full" />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">System Inquiry Parameters</label>
-                  <textarea placeholder="Specify system inquiry data parameters..." value={contactForm.message} onChange={e => setContactForm({ ...contactForm, message: e.target.value })} rows="5" className="bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition w-full resize-none" />
-                </div>
+                <textarea placeholder="Specify system inquiry data parameters..." value={contactForm.message} onChange={e => setContactForm({ ...contactForm, message: e.target.value })} rows="5" className="bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs focus:outline-none focus:border-amber-500 transition w-full resize-none" />
                 <button type="submit" className="w-full py-4 bg-amber-500 text-white rounded-xl font-black text-xs tracking-widest uppercase shadow-lg shadow-amber-100 hover:bg-amber-600 transition">TRANSMIT TELEMETRY PACKAGE</button>
                 {contactSuccess && <div className="text-emerald-600 text-[10px] font-bold text-center uppercase tracking-widest">✅ Data packet transmitted successfully</div>}
               </form>
@@ -601,7 +580,7 @@ export default function App() {
       <footer className="bg-slate-50 border-t border-slate-100 px-6 py-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">© 2024 EcoSpark Manufacturing Systems Inc. All Rights Reserved.</div>
-          <div className="text-[10px] font-black text-slate-900 tracking-[0.2em] uppercase text-center md:text-right">ADDIS ABABA SCIENCE AND TECHNOLOGY UNIVERSITY // INTEGRATED ENGINEERING TEAM PROJECT GROUP 11</div>
+          <div className="text-[10px] font-black text-slate-900 tracking-[0.2em] uppercase text-center md:text-right">ARES URBAN SCIENCE & TECHNOLOGY CAMPUS // INTEGRATED INFRASTRUCTURE SYSTEMS</div>
         </div>
       </footer>
     </div>
